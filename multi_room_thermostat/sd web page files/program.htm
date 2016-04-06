@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<div ui-view></div>
+<style>
+
+    body {
+      background:#444457;
+    }
+
+.subtitle {
+      background-color: #82BAC0;
+      width: 100%;
+      padding: 10px 30%;
+      font-size: 180%;
+
+      margin: 0 0 10px 0;
+      font-family: "MS Tahoma", Georgia;
+      color: #131E61;
+    
+}
+
+    .AL_box {
+      background:#D4DAE8;
+	  display: inline-block;      
+      margin: 3px 20px 20px 0;
+      border: 3px solid blue;
+      padding: 0 10px 15px 5px;
+      width: 600px;
+      border-radius: 10px;
+    }
+
+li, label, h2 {
+	  display: inline;
+      font-size: 100%;
+      color: #060505;
+      margin: 5px 0 0px 0;
+      padding: 25px 5px 0px 0px;
+      font-weight: bold;
+}
+
+.onOff_button {
+      display: inline-block;
+	  position: relative;
+      height: 30px;
+      width: 75px;
+      background: #B1B7B7;
+      border: 2px solid rgba(33, 68, 72, 0.59);
+      font-size: 20px;
+      text-align: center;
+      border-radius: 7px;
+      box-shadow: 0 3px 0 #1b383b;
+      margin: 0 3px;
+}
+
+.ok_button {
+      display: inline-block;
+	  position: relative;
+      height: 30px;
+      width: 60px;
+      background: #B1B7B7;
+      border: 2px solid rgba(33, 68, 72, 0.59);
+      font-size: 20px;
+      text-align: center;
+      border-radius: 7px;
+      box-shadow: 0 3px 0 #1b383b;
+      margin-left: 35px;
+
+}
+
+select {
+	display: inline;
+	position: relative;
+    width: 150px;
+    padding: 2px 0px;
+    margin-bottom: 10px;
+    background-color: white;
+    max-width: 80px;
+    font-size: 15px;
+    text-align: left;
+}
+
+input[type="number"] {
+	display: inline;
+	position: relative;
+    padding: 2px 5px 5px 0;
+    margin-bottom: 5px;
+    background-color: white;
+    max-width: 40px;
+    font-size: 15px;
+    text-align: left;
+}
+
+.setpoint {
+	display: inline;
+    padding: 2px 5px 5px 0;
+    margin-bottom: 5px;
+    background-color: white;
+    width: 50px;
+    max-width: 60px;
+    font-size: 15px;
+    text-align: left;
+    color: black;
+}
+
+.sp_box   {
+	display: inline;
+    padding: 2px 5px 5px 0;
+    max-width: 60px;
+    font-size: 20px;	
+    font-weight: bold;
+}
+</style> 
+
+<h1 class="subtitle">Program schedule</h1>
+
+<div ng-init="init()"></div>
+<div ui-view></div>
+<div class="AL_box" ng-repeat="alarm in alarms">
+
+	
+	<li>Alarm {{$index}} </li> <li>
+		<button type="button" class="onOff_button" ng-click="switchAlarm(switch, $index)" ng-model="alarm.switch">{{alarm.switch}}</button>
+	</li>
+	<label for="type"> Type: 
+		<select name="type" ng-model="alarm.type" ng-options="weekType as weekType for weekType in weekTypes">
+    	</select>
+    </label>
+	<li>hour
+		<input type="number" name="hour" min="0" max="23" ng-model="alarm.hour">
+	</li>
+	<li>minute
+		<input type="number" name="minute" min="0" max="59" ng-model="alarm.minute">
+	</li>
+	<li>
+		<button type="button" class="ok_button" ng-click="alarmsClk(alarm, $index)">Ok</button>
+	</li>
+	<br>
+	<h2>Setpoint: </h2><br>
+	<div class="sp_box" ng-repeat="setpoint in alarm.setpoints track by $index">
+		<li>#{{$index}}<input class="setpoint" type="number" name="#ch" min="5" max="35" step="0.5" ng-model="alarm.setpoints[$index]"></li>
+	</div>
+	
+</div>

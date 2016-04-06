@@ -1,0 +1,29 @@
+<!DOCTYPE html><!-- directive de repeat sur les données de vue channels -->
+
+
+
+<div ng-init="init()"></div>
+<div ui-view></div>
+  <div class="IO_box" ng-repeat="channel in channels">
+    <h2>{{channel.canal}}</h2>
+    <button type="button" ng-click="switchChannel(channel, channel.canal)" ng-model="channel.status"> {{channel.status}} </button>
+    <h2>
+      <form> name:<br>
+  		 <input type="text" name="Name" size="6" autocomplete="off" ng-model="channel.name" ng-focus="stopRefresh()" ng-blur="restartRefresh()">
+  		 <button ng-click="channelsClk(channel, channel.name)">change</button>
+      </form>
+    </h2>
+    <br>
+    <h4><span class="Ainput" >{{channel.temperature}}&#186;C</span></h4>
+    <h2>Setpoint 
+      <input type="number" name="setpoint" ng-model="channel.setPoint" ng-focus="stopRefresh()" ng-blur="restartRefresh()"
+           min="5" max="30" step="0.5" size="1"> &#186;C   <br />
+  		<button ng-click="channelsClk(channel, channel.setPoint)">ok</button>
+  	</h2>
+    <h5>state: 
+      <span class="permRun">{{channel.permRun}}</span>
+    </h5>
+    <h5>
+      <span class="AoutputChannel">{{channel.percent_out}}%</span>
+    </h5>
+  </div>

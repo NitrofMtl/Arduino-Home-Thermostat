@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Arduino Home Automation heater control></title>
+  <style>
+
+    body {
+      background:#444457;
+    }
+
+    .nav-button {
+      display: inline-block;
+    }
+
+    .top-button {
+      display: inline-block;
+      height: 50px;
+      width: 75px;
+      background: #B1B7B7;
+      border: 2px solid rgba(33, 68, 72, 0.59);
+      font-size: 20px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 8px 0 #1b383b;
+      margin: 0 15px;
+    }
+
+    .top-button2 {
+      display: inline-block;
+      height: 50px;
+      width: 95px;
+      background: #B1B7B7;
+      border: 2px solid rgba(33, 68, 72, 0.59);
+      font-size: 20px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 8px 0 #1b383b;
+      margin: 0 15px;
+    }
+
+    .top-button3 {
+      padding-right: 15px
+      display: inline-block;
+      height: 50px;
+      width: 95px;
+      background: #B1B7B7;
+      border: 2px solid rgba(33, 68, 72, 0.59);
+      font-size: 20px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 8px 0 #1b383b;
+      margin-left: 50px;
+      float: right;
+    }
+
+a:active {
+    background: #555;
+}
+
+a:link {
+    color: #131E61;
+}
+
+a:visited {
+    color: #131E61;
+}
+
+    h1 {
+      background-color: #82BAC0;
+      width: 100%;
+      padding: 15px 30%;
+      font-size: 180%;
+
+      margin: 0 0 10px 0;
+      font-family: "MS Tahoma", Georgia;
+      color: #131E61;
+    }
+    
+    h2 {
+      font-size: 120%;
+      color: #5734E6;
+      margin: 5px 5 5px 0;
+    }
+    
+    h3 {
+      font-size: 85%;
+      color: #060505;
+      margin: 5px 0 5px 0;
+    }
+    
+    h4 {
+      font-size: 85%;
+      color: #060505;
+      margin: 0px 0 3px 0;
+    }
+    
+    h5 {
+      font-size: 80%;
+      color: #060505;
+      margin: 0px 0 0px 0;
+    }
+
+    .IO_box {
+      background:#D4DAE8;
+      display: inline-block;
+      margin: 0 20px 20px 0;
+      border: 3px solid blue;
+      padding: 0 5px 0 5px;
+      width: 120px;
+      border-radius: 10px;
+    }
+    
+    p,
+    form,
+    button {
+      font-size: 80%;
+      color: #252525;
+      bottom: 10px;
+    }
+    
+    .small_text {
+      font-size: 80%;
+      color: #737373;
+    }
+    
+    h6 {
+      position: absolute;
+      bottom: 10px;
+    }
+
+
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+
+  <script>
+
+ angular
+  .module('app', [
+      'ui.router'
+    ])
+
+    .config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider, $stateProvider) {
+      $urlRouterProvider.otherwise('/');
+      $stateProvider
+        .state('home', {
+          url:"/",
+          templateUrl: 'http://192.168.0.110/home.htm',
+          controller:'temperatureCtrl',
+       })
+      .state('program', {
+        url:'/program',
+        templateUrl: 'http://192.168.0.110/program.htm',
+        controller:'alarmCtrl'
+      })
+      .state('config', {
+        url:'/config',
+        templateUrl: 'http://192.168.0.110/config.htm',
+        controller:'configCtrl'
+      })
+    }])
+  </script>
+
+</head>
+  <header>
+    <h1>Arduino Home Automation Heater Control</h1>
+    <nav>
+      <button type="button" class="top-button"><a href="#/home" ui-sref="home">Home</a></button>    
+      <button type="button" class="top-button2"><a href="#/program" ui-sref="program">Program</a></button>
+      <button type="button" class="top-button3"><a href="#/config" ui-sref="config">Config</a></button>
+    </nav>
+    <p></p>
+  </header>
+
+  <body>
+    <div class="container" ng-app="app" >
+      <div ui-view></div>
+    </div>
+  </body>
+  <script src="http://192.168.0.110/home.jsx"></script>
+  <script src="http://192.168.0.110/program.jsx"></script>
+  <script src="http://192.168.0.110/config.jsx"></script>
+</html>

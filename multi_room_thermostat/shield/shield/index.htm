@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Arduino Home Automation heater control</title>
+        <script type="text/javascript">
+		strChSwitch0 = "";  
+		strChSwitch1 = ""; 	
+		strChSwitch2 = ""; 
+		strChSwitch3 = "";
+		strChSwitch4 = ""; 		
+		strChSwitch5 = ""; 		
+		strChSwitch6 = ""; 		
+		strChSwitch7 = ""; 		
+ 		strChSwitch8 = ""; 	
+		strChSwitch9 = ""; 		
+		 		
+		//var LED3_state = 0; from org exemple
+		var chSwitch0_state = 0;
+		var chSwitch1_state = 0;
+		var chSwitch2_state = 0;
+		var chSwitch3_state = 0;
+		var chSwitch4_state = 0;
+		var chSwitch5_state = 0;
+		var chSwitch6_state = 0;
+		var chSwitch7_state = 0;
+		var chSwitch8_state = 0;
+		var chSwitch9_state = 0;
+		function GetArduinoIO()
+		{
+			nocache = "&nocache=" + Math.random() * 1000000;
+			var request = new XMLHttpRequest();
+			var url = "192.168.0.110";
+			request.onreadystatechange = function()
+			{
+				if (this.readyState == 4) {
+					if (this.status == 200) {
+						if (this.responseXML != null) {
+							// XML file received - contains analog values, switch values and LED states
+							var count;
+							// get analog string channelName
+							var num_an = this.responseXML.getElementsByTagName('channelName').length;
+							for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("channelName")[count].innerHTML =
+									this.responseXML.getElementsByTagName('channelName')[count].childNodes[0].nodeValue;
+
+							// get analog temps Ainput
+							var num_an = this.responseXML.getElementsByTagName('Ainput').length;
+							for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("Ainput")[count].innerHTML =
+									this.responseXML.getElementsByTagName('Ainput')[count].childNodes[0].nodeValue;
+
+							// get analog output % AoutputChannel
+							var num_an = this.responseXML.getElementsByTagName('AoutputChannel').length;
+							for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("AoutputChannel")[count].innerHTML =
+									this.responseXML.getElementsByTagName('AoutputChannel')[count].childNodes[0].nodeValue;
+							}
+
+							// get analog setpoint sp
+							var num_an = this.responseXML.getElementsByTagName('sp').length;
+							for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("sp")[count].innerHTML =
+									this.responseXML.getElementsByTagName('sp')[count].childNodes[0].nodeValue;
+							}
+
+							// get switch inputs
+							var num_an = this.responseXML.getElementsByTagName('switch').length;
+							for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("switches")[count].innerHTML =
+									this.responseXML.getElementsByTagName('switch')[count].childNodes[0].nodeValue;
+							}
+							// channel 0
+							if (this.responseXML.getElementsByTagName('channel')[0].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch0").innerHTML = "Channel 0 ON";
+								chSwitch0_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch0").innerHTML = "Channel 0 OFF";
+								chSwitch0_state = 0;
+							}
+							// channel 1
+							if (this.responseXML.getElementsByTagName('channel')[1].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch1").innerHTML = "Channel 1 ON";
+								chSwitch1_state = 1;
+							}
+							else {
+								document.getElementById("LEDchSwitch1").innerHTML = "Channel 1 OFF";
+								chSwitch1_state = 0;
+							}
+							// channel 2
+							if (this.responseXML.getElementsByTagName('channel')[2].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch2").innerHTML = "Channel 2 ON";
+								chSwitch2_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch2").innerHTML = "Channel 2 OFF";
+								chSwitch2_state = 0;
+							}
+							// channel 3
+							if (this.responseXML.getElementsByTagName('channel')[3].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch3").innerHTML = "Channel 3 ON";
+								chSwitch3_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch3").innerHTML = "Channel 3 OFF";
+								chSwitch3_state = 0;
+							}
+							// channel 4
+							if (this.responseXML.getElementsByTagName('channel')[4].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch4").innerHTML = "Channel 4 ON";
+								chSwitch4_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch4").innerHTML = "Channel 4 OFF";
+								chSwitch4_state = 0;
+							}
+							// channel 5
+							if (this.responseXML.getElementsByTagName('channel')[5].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch5").innerHTML = "Channel 5 ON";
+								chSwitch5_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch5").innerHTML = "Channel 5 OFF";
+								chSwitch5_state = 0;
+							}
+							// channel 6
+							if (this.responseXML.getElementsByTagName('channel')[6].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch6").innerHTML = "Channel 6 ON";
+								chSwitch6_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch6").innerHTML = "Channel 6 OFF";
+								chSwitch6_state = 0;
+							}
+							// channel 7
+							if (this.responseXML.getElementsByTagName('channel')[7].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch7").innerHTML = "Channel 7 ON";
+								chSwitch7_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch7").innerHTML = "Channel 7 OFF";
+								chSwitch7_state = 0;
+							}
+							// channel 8
+							if (this.responseXML.getElementsByTagName('channel')[8].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch8").innerHTML = "Channel 8 ON";
+								chSwitch8_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch8").innerHTML = "Channel 8 OFF";
+								chSwitch8_state = 0;
+							}
+							// channel 9
+							if (this.responseXML.getElementsByTagName('channel')[9].childNodes[0].nodeValue === "on") {
+								document.getElementById("chSwitch9").innerHTML = "Channel 9 ON";
+								chSwitch9_state = 1;
+							}
+							else {
+								document.getElementById("chSwitch9").innerHTML = "Channel 9 OFF";
+								chSwitch9_state = 0;
+							}
+													
+									// send HTTP GET request with LEDs to switch on/off if any
+			   // replace str led3 var
+			request.open("GET", url, "ajax_inputs" + strChSwitch0  + strChSwitch1  + strChSwitch2  + strChSwitch3  + strChSwitch4  
+			+ strChSwitch5  + strChSwitch6 + strChSwitch7  + strChSwitch8  + strChSwitch9  + nocache, true);
+			request.send(null);
+			setTimeout(GetArduinoIO(), 1000);
+			strChSwitch0   = "";
+			strChSwitch1   = "";
+			strChSwitch2   = "";
+			strChSwitch3   = "";
+			strChSwitch4   = "";
+			strChSwitch5   = "";
+			strChSwitch6   = "";
+			strChSwitch7   = "";
+			strChSwitch8   = "";
+			strChSwitch9   = "";
+			
+		}
+		
+	        // get switch inputs
+				        var num_an = this.responseXML.getElementsByTagName('switch').length;
+						for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("switches")[count].innerHTML =
+									this.responseXML.getElementsByTagName('switch')[count].childNodes[0].nodeValue;
+							}	from exemple    
+							
+			// get switch inputs
+							var num_an = this.responseXML.getElementsByTagName('permRun').length;
+							for (count = 0; count < num_an; count++) {
+								document.getElementsByClassName("permRun")[count].innerHTML =
+									this.responseXML.getElementsByTagName('permRun')[count].childNodes[0].nodeValue;
+							}				
+							
+							
+		
+	/*	
+				function GetButton1()
+		{
+			if (LED3_state === 1) {
+				LED3_state = 0;
+				strLED3 = "&LED3=0";
+			}
+			else {
+				LED3_state = 1;
+				strLED3 = "&LED3=1";
+			}
+		}*/
+		
+		
+				function GetButton0()
+		{
+			if (chSwitch0_state === 1) {
+				chSwitch0_state = 0;
+				strChSwitch0 = "&chSwitch0=0";
+			}
+			else {
+				chSwitch0_state = 1;
+				strChSwitch0 = "&chSwitch0=1";
+			}
+		}
+						function GetButton1()
+		{
+			if (chSwitch1_state === 1) {
+				chSwitch1_state = 0;
+				strChSwitch1 = "&chSwitch1=0";
+			}
+			else {
+				chSwitch1_state = 1;
+				strChSwitch1 = "&chSwitch1=1";
+			}
+		}
+						function GetButton2()
+		{
+			if (chSwitch2_state === 1) {
+				chSwitch2_state = 0;
+				strChSwitch2 = "&chSwitch2=0";
+			}
+			else {
+				chSwitch2_state = 1;
+				strChSwitch2 = "&chSwitch2=1";
+			}
+		}
+						function GetButton3()
+		{
+			if (chSwitch3_state === 1) {
+				chSwitch3_state = 0;
+				strChSwitch3 = "&chSwitch3=0";
+			}
+			else {
+				chSwitch3_state = 1;
+				strChSwitch3 = "&chSwitch3=1";
+			}
+		}
+						function GetButton4()
+		{
+			if (chSwitch4_state === 1) {
+				chSwitch4_state = 0;
+				strChSwitch4 = "&chSwitch4=0";
+			}
+			else {
+				chSwitch4_state = 1;
+				strChSwitch4 = "&chSwitch4=1";
+			}
+		}
+						function GetButton5()
+		{
+			if (chSwitch5_state === 1) {
+				chSwitch5_state = 0;
+				strChSwitch5 = "&chSwitch5=0";
+			}
+			else {
+				chSwitch5_state = 1;
+				strChSwitch5 = "&chSwitch5=1";
+			}
+		}
+						function GetButton6()
+		{
+			if (chSwitch6_state === 1) {
+				chSwitch6_state = 0;
+				strChSwitch6 = "&chSwitch6=0";
+			}
+			else {
+				chSwitch6_state = 1;
+				strChSwitch6 = "&chSwitch6=1";
+			}
+		}
+						function GetButton7()
+		{
+			if (chSwitch7_state === 1) {
+				chSwitch7_state = 0;
+				strChSwitch7 = "&chSwitch7=0";
+			}
+			else {
+				chSwitch7_state = 1;
+				strChSwitch7 = "&chSwitch7=1";
+			}
+		}
+						function GetButton8()
+		{
+			if (chSwitch8_state === 1) {
+				chSwitch8_state = 0;
+				strChSwitch8 = "&chSwitch8=0";
+			}
+			else {
+				chSwitch8_state = 1;
+				strChSwitch8 = "&chSwitch8=1";
+			}
+		}
+						function GetButton9()
+		{
+			if (chSwitch9_state === 1) {
+				chSwitch9_state = 0;
+				strChSwitch9 = "&chSwitch9=0";
+			}
+			else {
+				chSwitch9_state = 1;
+				strChSwitch9 = "&chSwitch9=1";
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+</script>
+	<style>
+		.IO_box {
+			float: left;
+			margin: 0 20px 20px 0;
+			border: 1px solid blue;
+			padding: 0 5px 0 5px;
+			width: 120px;
+		}
+		h1 {
+			font-size: 120%;
+			color: blue;
+			margin: 0 0 10px 0;
+		}
+		h2 {
+			font-size: 85%;
+			color: #5734E6;
+			margin: 5px 0 5px 0;
+		}
+		h3 {
+			font-size: 85%;
+			color: #060505;
+			margin: 22px 0 5px 0;
+		h4 {
+			font-size: 85%;
+			color: #060505;
+			margin: 0px 0 5px 0;
+		}
+		p, form, button {
+			font-size: 80%;
+			color: #252525;
+		}
+		.small_text {
+			font-size: 80%;
+			color: #737373;
+		}		
+		h5 {
+    position: absolute;
+    bottom: -5px;
+		}
+			</style>
+    </head>
+    <body onload="GetArduinoIO()">
+        <h1>Arduino Home Automation heater control</h1>
+		
+		<div class="IO_box">
+			<h2>Channel 0</h2>
+			<p><span <input type="text" size="50"  id="channelName">...</span></p>
+			<p><span class="channelName">...</span></p> 
+			<button type="button" id="chSwitch0" onclick="GetButton0()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+
+		<div class="IO_box">
+			<h2>Channel 1</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch1" onclick="GetButton1()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 2</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch2" onclick="GetButton2()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 3</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch3" onclick="GetButton3()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 4</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch4" onclick="GetButton4()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 5</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch5" onclick="GetButton5()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 6</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch6" onclick="GetButton6()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 7</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch7" onclick="GetButton7()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 8</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch8" onclick="GetButton8()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+				<div class="IO_box">
+			<h2>Channel 9</h2>
+			<p><span class="channelName">...</span></p>
+			<button type="button" id="chSwitch9" onclick="GetButton9()"> OFF </button><br /><br />
+			
+			<p><span class="Ainput">...&#186;C</span></p>
+			<p><span class="sp">Setpoint ...&#186;C</span></p>
+			<p><h4>state: <span class="permRun">...</span></h4></p>
+			<p><span class="AoutputChannel">...%</span></p>
+		</div>
+			
+	<p><h5> <a href="page2.htm">Config</a>.</h5></p>		
+    </body>
+</html>
+
