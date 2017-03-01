@@ -1,4 +1,4 @@
-# Arduino-Home-Thermostat
+# Arduino-Home-Thermostat Version 2.0
 10 rooms thermostat
 
 
@@ -19,6 +19,17 @@ Web page is store on SD card.
 
 Configurations, setpoints and program alarms are store on SD card and restore when arduino reboot.
 
+
+Version 2.0 upgrades:
+  -upgraded library perfomance for analong reading
+  -Adding analog sequencer
+  -upgraded weeklyAlarm library
+  -added library to handle timning event interval so save mcu operation
+  -rap mosh of webpage file inside index.htm to have less request and faster load of graphical  user interface 
+  -upgraded rest interface
+  -general sketch structure upgrade, bugs fix...
+
+  Check "Library dependency list.md" for all link of out side code.
 
   Copyright (c) 03/04/2016
 
