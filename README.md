@@ -29,7 +29,7 @@ Version 2.0 upgrades:
   upgraded rest interface
   general sketch structure upgrade, bugs fix...
 
-  Check "Library-dependency-list.md" for all link of out side code.
+Check "Library-dependency-list.md" for all link of out side code.
 
   Copyright (c) 03/03/2017
 
