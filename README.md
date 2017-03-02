@@ -10,10 +10,10 @@ User can control options through GUI web page with ethernet shield.
 User can name room and control setpoints for each channels. 
 It also have an program page for schedule temperature for each rooms.
 Program haves 4 mode of operation:
-  -single day (sunday to saturday)
-  -week day (monday to friday)
-  -week-end
-  -all day
+  single day (sunday to saturday)
+  week day (monday to friday)
+  week-end
+  all day
 
 Web page is store on SD card.
 
@@ -21,13 +21,13 @@ Configurations, setpoints and program alarms are store on SD card and restore wh
 
 
 Version 2.0 upgrades:
-  -upgraded library perfomance for analong reading
-  -Adding analog sequencer
-  -upgraded weeklyAlarm library
-  -added library to handle timning event interval so save mcu operation
-  -rap most of webpage file inside index.htm to have less request and faster load of graphical user interface 
-  -upgraded rest interface
-  -general sketch structure upgrade, bugs fix...
+  upgraded library perfomance for analong reading
+  Adding analog sequencer
+  upgraded weeklyAlarm library
+  added library to handle timning event interval so save mcu operation
+  rap most of webpage file inside index.htm to have less request and faster load of graphical user interface 
+  upgraded rest interface
+  general sketch structure upgrade, bugs fix...
 
   Check "Library-dependency-list.md" for all link of out side code.
 
