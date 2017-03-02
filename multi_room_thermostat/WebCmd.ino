@@ -1,5 +1,8 @@
-////--------------- JSON functions
+void webServ() { //run in void loop
+  uHTTPserver->requestHandler();
+}
 
+//-----------------------------------------------------------
 JsonObject& JSONInputs(JsonBuffer& jsonBuffer) {
 
   JsonObject& channels = jsonBuffer.createObject();
@@ -10,13 +13,11 @@ JsonObject& JSONInputs(JsonBuffer& jsonBuffer) {
     chan_in["name"] = inChannelID[i].channelName;
     chan_in["canal"] = String(i);
     chan_in["status"] = onOffBool(outChannelID[i].channelSwitch);
-    chan_in["temperature"] = inChannelID[i].Ainput;
+    chan_in["temperature"] = double_with_n_digits(inChannelID[i].Ainput, 1);
     chan_in["setPoint"] = outChannelID[i].sp;
     chan_in["permission"] = outChannelID[i].permRun;
     chan_in["percentOut"] = outChannelID[i].Aoutput;
-
     chan.add(chan_in);
-
   }
   return channels;
 }
@@ -26,15 +27,15 @@ JsonObject& JSONInputs(JsonBuffer& jsonBuffer) {
 void writeJSONResponse() {
   StaticJsonBuffer<3000> jsonBuffer;
   JsonObject& json = JSONInputs(jsonBuffer);
-  uHTTPserver->send_JSON_headers(response);
-  json.prettyPrintTo(response);
+  uHTTPserver->send_JSON_headers();
+  json.printTo(response);
 }
 
 //-----------------------------------------------------------
 
-void parseJSONInputs(const char json[]) {
+void parseJSONInputs() {
   StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(const_cast<char*>(json));
+  JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
 
   if (!root.success()) {
     Serial.println("parseObject() failed");
@@ -47,14 +48,14 @@ void parseJSONInputs(const char json[]) {
   backup();
 }
 
-void parseJSONswitch(const char json[]) {
+void parseJSONswitch() {
   StaticJsonBuffer<255> jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(json);
+  JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
-  root.prettyPrintTo(Serial); Serial.println("switch");
+  //root.prettyPrintTo(Serial); Serial.println("switch");
   byte  chanId = root["switchCh"]["canal"];
   outChannelID[chanId].channelSwitch = !outChannelID[chanId].channelSwitch;
   //Serial.println(chanId);
@@ -65,43 +66,40 @@ void parseJSONswitch(const char json[]) {
 //-----------------------------------------------------------
 // -------------   JSON alarms -----------------------------
 
-void parseJSONswitchAlarms(const char json[]) {
+void parseJSONswitchAlarms() {
   StaticJsonBuffer<255> jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(json);
+  JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
 
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
-  SPAlarm.weeklyAlarmSwitch(root["switchAlarm"]["switchAlarm"]);//toggle alarm switch
+  SPAlarm.toggle(root["switchAlarm"]["switchAlarm"]);    //toggle alarm switch
+  backup();
 }
 
 //-----------------------------------------------------------
-String weekType[11] {"null", "sunday", "monday", "tuesday", "wednesday", "thursday", "Friday", "saturday", "Week", "Week end", "All days" };
-
-byte typeIdent(String input) {
-  int output = 0;
-  for (int i = 0; input != weekType[i]; i++) {
-    output = i + 1;
-  }
-  return output;
-}
 
 JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
   JsonObject& alarm = jsonBuffer.createObject();
+  JsonArray& chName = alarm.createNestedArray("chName");
+  for ( byte i = 0; i < numSetpoint; i++) {
+    chName.add(inChannelID[i].channelName);
+  }
   JsonArray& alarmID = alarm.createNestedArray("alarms");
 
 
-  for (byte i = 0; i < 10; i++) {
-    String OnOff = intToOnOff(SPAlarm.getParam(i, 0)); //get alrm param,1= id, 2 = param 0-3[switch,type,hour,minute]
-    String weekDay = weekType[SPAlarm.getParam(i, 1)];
-    byte hourAl = SPAlarm.getParam(i, 2);
-    byte minAl = SPAlarm.getParam(i, 3);
+  for (byte i = 0; i < numAlarm; i++) {
+    String OnOff = SPAlarm.isOnOff(i); //return String "ON" or "OFF"
+    String weekDay = SPAlarm.weekType(i); // return alarm type
+    byte hourAl = SPAlarm.almHour(i);
+    byte minAl = SPAlarm.almMin(i);
     JsonObject& alarm_in = jsonBuffer.createObject();
     alarm_in["switch"] = OnOff;
     alarm_in["type"] = weekDay;
     alarm_in["hour"] = hourAl;
     alarm_in["minute"] = minAl;
+
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
     for ( byte j = 0; j < numSetpoint; j++) {
       float setPointAl = alarmMem[i][j];
@@ -115,27 +113,29 @@ JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
 void writeJSON_Alarm_Response() { //alarm json sender
   StaticJsonBuffer<5500> jsonBuffer;
   JsonObject& json = JSONalarm(jsonBuffer);
-  uHTTPserver->send_JSON_headers(response);
-  json.prettyPrintTo(response);
+  uHTTPserver->send_JSON_headers();
+  json.printTo(response);
 }
 
 //-----------------------------------------------------------
 
-void parseJSONalarms(const char json[]) {
+void parseJSONalarms() {
+  //Serial.println("parse alarm request");
   StaticJsonBuffer<1023> jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(const_cast<char*>(json));
+  JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
 
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
 
-  byte alarmID = root["alarms"]["index"];
-  byte weekType = typeIdent(toString(root["alarms"]["data"]["type"]));
-  byte almrSwitch = onOffToInt(root["alarms"]["data"]["switch"]);
-  byte alrmHour = root["alarms"]["data"]["hour"];
-  byte alrmMin = root["alarms"]["data"]["minute"];
-  SPAlarm.setWeeklyAlarm(alarmID, weekType, 1, alrmHour, alrmMin); //alarm tag, type alarm, alarm switch, hour, minute
+  //root.prettyPrintTo(Serial);
+  int8_t alarmID = root["alarms"]["index"];
+  String weekType = root["alarms"]["data"]["type"];
+  String almrSwitch = root["alarms"]["data"]["switch"];
+  int8_t alrmHour = root["alarms"]["data"]["hour"];
+  int8_t alrmMin = root["alarms"]["data"]["minute"];
+  SPAlarm.set(alarmID, weekType, almrSwitch, alrmHour, alrmMin); //alarm tag, type alarm, alarm switch, hour, minute
 
   JsonArray& setpoints = root["alarms"]["data"]["setpoints"];
   byte i = 0;
@@ -143,7 +143,7 @@ void parseJSONalarms(const char json[]) {
     alarmMem[alarmID][i] = *it;
     i++;
   }
-backup();
+  backup();
 }
 
 //-----------------------------------------------------------
@@ -163,6 +163,7 @@ JsonObject& JSONconfigs(JsonBuffer& jsonBuffer) {
     JsonObject& chan_in = jsonBuffer.createObject();
     chan_in["offset"] = inChannelID[i].offset;
     chan_in["canal"] = String(i);
+    chan_in["temperature"] = inChannelID[i].Ainput;
     chan.add(chan_in);
   }
 
@@ -171,18 +172,19 @@ JsonObject& JSONconfigs(JsonBuffer& jsonBuffer) {
 }
 
 void writeJSONConfigResponse() {
+  inputRead(); // update all input reading more often for calibration
   StaticJsonBuffer<2000> jsonBuffer;
   JsonObject& json = JSONconfigs(jsonBuffer);
-  uHTTPserver->send_JSON_headers(response);
-  json.prettyPrintTo(response);
+  uHTTPserver->send_JSON_headers();
+  json.printTo(response);
 }
 
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 
-void parseJSONConfigs(const char json[]) {
+void parseJSONConfigs() {
   StaticJsonBuffer<2000> jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(const_cast<char*>(json));
+  JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
 
   if (!root.success()) {
     Serial.println("parseObject() failed");
@@ -200,7 +202,6 @@ void parseJSONConfigs(const char json[]) {
     id = input["canal"];
     inChannelID[id].offset = input["offset"];
   }
-  RTDSetup(); //apply change to library obbject
-  setupOutput();  //apply change to library obbject
+
   backup();
 }

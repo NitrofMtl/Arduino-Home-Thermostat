@@ -22,16 +22,10 @@ JsonObject& JSONbackup(JsonBuffer& jsonBuffer) {
     chan_in["setPoint"] = outChannelID[i].sp;
     inputs.add(chan_in);
   }
+
   JsonArray& alarmID = backup.createNestedArray("alarms");
-
   for (byte i = 0; i < 10; i++) {
-    //get alrm param,1= id, 2 = param 0-3[switch,type,hour,minute]
-
-    JsonObject& alarm_in = jsonBuffer.createObject();
-    alarm_in["switch"] = SPAlarm.getParam(i, 0);
-    alarm_in["type"] = SPAlarm.getParam(i, 1);
-    alarm_in["hour"] = SPAlarm.getParam(i, 2);
-    alarm_in["minute"] = SPAlarm.getParam(i, 3);
+    JsonObject& alarm_in = SPAlarm.backupAlarm(i, jsonBuffer);
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
     for ( byte j = 0; j < numSetpoint; j++) {
       float setPointAl = alarmMem[i][j];
@@ -46,8 +40,7 @@ JsonObject& JSONbackup(JsonBuffer& jsonBuffer) {
 void backup() {
   StaticJsonBuffer<4000> jsonBuffer;
   JsonObject& json = JSONbackup(jsonBuffer);
-  uHTTPserver->send_JSON_headers(response);
-  json.prettyPrintTo(Serial);
+  //json.prettyPrintTo(Serial);
   File log;
   SD.remove("backup/BACKUP.txt"); //delete old file to reset data
   log = SD.open("backup/BACKUP.txt", FILE_WRITE);
@@ -95,13 +88,16 @@ void restore() {
   for (JsonArray::iterator it = alarms.begin(); it != alarms.end(); ++it) {
     JsonObject& alarm = *it;
     //alarm.prettyPrintTo(Serial);
+    SPAlarm.restoreAlarm(alarmTag, alarm);
     byte alarmType = alarm["type"];
-    byte alarmSwitch = alarm["switch"];
+    bool alarmSwitch = alarm["switch"];
     byte wHour = alarm["hour"];
     byte wMin = alarm["minute"];
-    SPAlarm.setWeeklyAlarm(alarmTag, alarmType, alarmSwitch, wHour, wMin);
+    SPAlarm.set(alarmTag, alarmType, alarmSwitch, wHour, wMin);
+
     JsonArray& setpoints = alarm["setpoints"];
     //setpoints.prettyPrintTo(Serial);
+
     byte spTag = 0;
     for (JsonArray::iterator jt = setpoints.begin(); jt != setpoints.end(); ++jt) {
       float setpoint = *jt;

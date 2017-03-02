@@ -17,11 +17,16 @@ void setupSdCard() {
 
 //-----------------------------------------------------------
 
+
+
 void setupEthernet() {
   Ethernet.begin(mac, ip);
   Serial.print("Ip address; "); Serial.println(Ethernet.localIP());
   server.begin();
   uHTTPserver->begin();
+  uHTTPserver->uHTTPclient(&response);   //link uHTTP EthernetClient with sketch EthernetClient
+  uHTTPserver->addToContainer(uHTTP_METHOD_GET, getContainer, SizeOfArray(getContainer)); //add get request to uhttp handeler
+  uHTTPserver->addToContainer(uHTTP_METHOD_PUT, putContainer, SizeOfArray(putContainer)); //add put request to uhttp handeler
 }
 
 //-----------------------------------------------------------
@@ -32,19 +37,15 @@ void setupTime() {
   if (Serial.available() > 0) ; {
     Serial.println("waiting for sync");
   }
-//  setSyncProvider(getNtpTime);
-    setClock(&Udp);  
+  setClock(&Udp);
   setSyncInterval(2592000);//sync clock once a mounth
 }
 
 //-----------------------------------------------------------
 
 void RTDSetup() {
-  analogReadResolution(Reso); //set arduino analog input to 12 bit reading
-  for (int i = 0; i <= 9; i++) {
-    RTDRead[i].init(3.3, 12); //initialize RTD library, set the reference input voltage 3.3V or 5V, arduino DUE only for 12 bytes resolution, 10 for other board
-    RTDRead[i].calibrateRref(i, calibOffset[i]); //calibrate shield Reference resistor, (analog in, calibration value find with calibration sketch)
-  }
+  adc.begin(); //initiate sequencer, have to be before 'analogReadResolution' call to not reset it to 10
+  analogReadResolution(RESO); //set arduino analog input to 12 bit reading
   /////         RTD inputs struct initializing
   //InChannels[id](name, pin, switchCh, offset)
   inChannelID[0].channelSet( "name0", A0, true, 0);
@@ -75,4 +76,21 @@ void setupOutput() {
   outChannelID[7].OutChannels(29, 5, smm, false);
   outChannelID[8].OutChannels(30, 5, smm, false);
   outChannelID[9].OutChannels(31, 5, smm, false);
+}
+
+void setupWeeklyAlarm() {
+  init_alarmMemory();
+  //set alarm: (id, type, almSwitch, Hour, Min, callback)
+  //type:SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURSDAY, WEEK, WEEK_END, ALL_DAYS
+  for (int i = 0; i < numAlarm; i++) {
+    SPAlarm.set(i, ALL_DAYS, OFF, 0, 0, setSp);
+  }
+}
+
+void init_alarmMemory() {   //initiane alarm memory matrix to 21C by default
+  for (byte i = 0; i < numAlarm; i++) {
+    for (byte j = 0; j < numSetpoint; j++) {
+      alarmMem[i][j] = 21;
+    }
+  }
 }

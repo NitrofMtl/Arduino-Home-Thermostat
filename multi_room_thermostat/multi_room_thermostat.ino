@@ -21,34 +21,41 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
 #include <SD.h>
 #include <SPI.h>
 #include <Dhcp.h>
 #include <Dns.h>
-#include <Ethernet.h>
+#include <Ethernet2.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
-#include <EthernetUdp.h>
+#include <EthernetUdp2.h>
 #include <TimeLib.h>
 #include <weeklyAlarm.h>
 #include <DueTimer.h>
-#include <RTD10k.h>
+#include <TimeOut.h>
 //#include <currentSwitch.h>  //not used in this controler
 //#include <Bounce2.h> //not used in this controler
 #include <uHTTP.h>
 #include <ArduinoJson.h>
 #include <snippets.h>
+#include <RTD10K.h>
 #include <IOctrl.h>
+#include <ADC_SEQR.h>
+#include <Streaming.h>
 #define REQ_BUF_SZ   60   // size of buffer used to capture HTTP requests
 
 #define vRef 3.3   //set reference voltage to 3.3 or 5.0V
-#define Reso 12    //set resolution to 10 or 12 for arduino DUE
+#define RESO 12    //set resolution to 10 or 12 for arduino DUE
 #define SDC_PIN 4 // pin for sd card
 #define default_page "index.htm"  //set the default page to load on request
 
-RTD10k RTDRead[10];  // start an instance of RTD10k
-weeklyAlarm SPAlarm;
-//currentSwitch workProof;
+void watchdogSetup (void) {
+  watchdogEnable(4095); //enable watchdog to maximum time 0xFFF
+}
+
+
+//currentSwitch workProof; not use in this controler
 Backup bckup;
 Snippets sn;
 
@@ -56,86 +63,95 @@ byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF};
 IPAddress ip(192, 168, 0, 110);
 uHTTP *uHTTPserver = new uHTTP(80);
 EthernetClient response;
-
 EthernetUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
-
-char HTTP_req[REQ_BUF_SZ] = {0}; // buffered HTTP request stored as null terminated string
-char req_index = 0;              // index into HTTP_req buffer
-
 EthernetServer server(80);
 
+Adc_Seqr adc;
+
+
+RTD10k RTDRead(RESO); //library to read 10k RTD input
 //    Per channel declare section Struct array
 const byte numChannel = 10;
-RTDinChannels inChannelID[numChannel];
-SSRoutput outChannelID[numChannel];
+RTDinChannels inChannelID[numChannel]; //input channel obj
+SSRoutput outChannelID[numChannel]; //ouput channel obj
 
 //global Regulator variables
 byte K = 80; // set process gain 1 to 10
 float vs = 0.5; // set sustain value in degres
 float smm = 5; // treshold in pourcent
-float calibOffset[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //calibration of Shield rRef resistor
+//float calibOffset[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //calibration of Shield rRef resistor
 
-byte numAlarm = 10; // set the number of alarm
+//interval instance
+Interval timerMainRegulator;
+Interval timerWeeklyAlarm;
+
+//programable alarm section
 byte numSetpoint = 10; //set number of setpoint save in conjuction with outchannel
-
+byte numAlarm = 10; // set the number of alarm
+WeeklyAlarm SPAlarm(numAlarm);//initiane 10 alarm
 float alarmMem[10][10];  // vector 1 = numAlarm, vector 2 = setpoint
 
+uHTTP_request getContainer[] = {    //resquest index : (ID, callback function)
+  {"ajax_inputs", writeJSONResponse},
+  {"ajax_alarms", writeJSON_Alarm_Response},
+  {"configs", writeJSONConfigResponse}
+};
+
+uHTTP_request putContainer[] = {    //resquest index : (ID, callback function)
+  {"channels", parseJSONInputs},
+  {"alarms", parseJSONalarms},
+  {"switch", parseJSONswitch},
+  {"switchAlarms", parseJSONswitchAlarms},
+  {"configs", parseJSONConfigs}
+};
+
+
+//function prototype
+void setupSdCard();
+void setupEthernet();
+void setupTime();
+void regulator_inputs();
+void regulator_outputs();
+void checkWekklyAlarm();
+void RTDSetup();
+void setupOutput();
+void restore();
 
 //-----------------------------------------------------------------
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+
+  Serial.println("startup");
   setupSdCard();
   setupEthernet();
   setupTime();
-  Timer3.attachInterrupt(regulator_inputs).setFrequency(0.1).start(); // read inputs every 10 sec
+  //Timer3.attachInterrupt(regulator_inputs).setFrequency(0.1).start(); // read inputs every 10 sec //-->move into interval methode
+  timerMainRegulator.interval(sc(10),regulator_inputs);// read inputs every 10 sec
   Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //outputs regulator controler at 10 Hz
+  timerWeeklyAlarm.interval(mn(1),checkWekklyAlarm); //check weekly alarm each minute
   RTDSetup();
   setupOutput();
-  SPAlarm.weeklyAlarmInit();
-  init_alarmMemory();
+  setupWeeklyAlarm();
   restore(); //restoring data from sd card
+  WDT_Restart (WDT); //reset the watchdog timer
   delay(1000);
 }
 
 //-----------------------------------------------------------
 //-----------------------------------------------------------
+void webServ();
 
 void loop() {
-//  printTime();
-  webserv();
+  //printTime();
+  webServ();
+  Interval::handler();
+  //SPAlarm.handler(); // move into interval methode
+  WDT_Restart (WDT); //reset the watchdog timer
+  delay(1);
 }
 
 //-----------------------------------------------------------
 
-void webserv() { //              uHTTP version
-  char url[32];
-  if ((response = uHTTPserver->available())) {
 
-    if (uHTTPserver->uri("/") ) {
-      if (uHTTPserver->method(uHTTP_METHOD_GET)) {
-        strcpy(url, default_page); // if nothing requested, send default page
-        uHTTPserver->send_headers(200, response);
-        uHTTPserver->webFile_Post(url,  response); //send default page
-      }
-      else if (uHTTPserver->method(uHTTP_METHOD_OPTIONS)) uHTTPserver->send_headers(200, response);
-    }
-    else {
-      if ( uHTTPserver->get_request("ajax_inputs", response)) writeJSONResponse(); // look up for a get request of key "ajax_inputs"
-      else if ( uHTTPserver->get_request("ajax_alarms", response)) writeJSON_Alarm_Response();
-      else if ( uHTTPserver->get_request("configs", response)) writeJSONConfigResponse();
-      else if (uHTTPserver->put_request("channels", response)) parseJSONInputs(uHTTPserver->body());
-      else if (uHTTPserver->put_request("alarms", response)) parseJSONalarms(uHTTPserver->body());
-      else if (uHTTPserver->put_request("switch", response)) parseJSONswitch(uHTTPserver->body());
-      else if (uHTTPserver->put_request("switchAlarms", response)) parseJSONswitchAlarms(uHTTPserver->body());
-      else if (uHTTPserver->put_request("configs", response)) parseJSONConfigs(uHTTPserver->body());
-      else
-        strcpy(url, uHTTPserver->uri());
-      uHTTPserver->webFile_Post(url,  response); //send other file if they exist on sd card
-
-      // else uHTTPserver->send_headers(404, TEXT_HTML, response);
-    }
-    response.stop();
-  }
-}

@@ -2,14 +2,14 @@
 10 rooms thermostat
 
 
-Sketch for Arduino that use 10 analogs inputs to read temperature and 10 digitals outputs to control solid state relay (SSR) on heater.
+Sketch for Arduino DUE that use 10 analogs inputs to read temperature and 10 digitals outputs to control solid state relay (SSR) on heater.
 
 
 User can control options through GUI web page with ethernet shield.
 
 User can name room and control setpoints for each channels. 
-It also have an alarm page for schedule temperature for each rooms.
-Alarms haves 4 mode of operation:
+It also have an program page for schedule temperature for each rooms.
+Program haves 4 mode of operation:
   -single day (sunday to saturday)
   -week day (monday to friday)
   -week-end
@@ -25,13 +25,13 @@ Version 2.0 upgrades:
   -Adding analog sequencer
   -upgraded weeklyAlarm library
   -added library to handle timning event interval so save mcu operation
-  -rap mosh of webpage file inside index.htm to have less request and faster load of graphical  user interface 
+  -rap most of webpage file inside index.htm to have less request and faster load of graphical user interface 
   -upgraded rest interface
   -general sketch structure upgrade, bugs fix...
 
-  Check "Library dependency list.md" for all link of out side code.
+  Check "Library-dependency-list.md" for all link of out side code.
 
-  Copyright (c) 03/04/2016
+  Copyright (c) 03/03/2017
 
     By Nitrof
 
@@ -51,5 +51,3 @@ Version 2.0 upgrades:
   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
