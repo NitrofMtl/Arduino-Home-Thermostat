@@ -27,9 +27,11 @@
 #include <Dhcp.h>
 #include <Dns.h>
 #include <Ethernet2.h>
+//#include <Ethernet.h> //to use ethernet shield 1, mute ethernet2.h and unmute ethernet.h
 #include <EthernetClient.h>
 #include <EthernetServer.h>
 #include <EthernetUdp2.h>
+//#include <EthernetUdp.h> //to use ethernet shield 1, mute EthernetUdp2.h and unmute EthernetUdp.h
 #include <TimeLib.h>
 #include <weeklyAlarm.h>
 #include <DueTimer.h>
