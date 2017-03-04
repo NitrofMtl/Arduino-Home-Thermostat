@@ -317,11 +317,16 @@ a:visited {
      };
    }])
 
-
-   .controller('configCtrl', ["$scope", "$timeout", "configService", function($scope, $timeout, service) {
+   .controller('configCtrl', ["$scope", "$interval", "$timeout", "configService", function($scope, $interval, $timeout, service) {
 
      $scope.configs = [];
+     var autoRefresh;
 
+     function startRefresh() {
+       autoRefresh = $interval(function() {
+         update();
+       }, 1000);
+     }
 
      function update() {
        service.getConfigs(function(err, result) {
@@ -335,7 +340,21 @@ a:visited {
 
      $scope.init = function() { //on load page first get data
        update();
+       startRefresh()
      };
+
+     $scope.stopRefresh = function() { //ng-mousedown
+       $interval.cancel(autoRefresh);
+     };
+
+     $scope.restartRefresh = function() {
+       startRefresh();
+     };
+
+     $scope.$on('$destroy', function() {
+       // Make sure that the interval is destroyed too
+       $scope.stopRefresh();
+     });
 
 
      $scope.configClk = function(configs) {
@@ -343,7 +362,7 @@ a:visited {
        console.log(chanObj)
        service.putConfigs(chanObj, function() {});
        $timeout(function() {
-         update()
+         startRefresh()
        }, 2000);
      }
    }])
