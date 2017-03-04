@@ -136,32 +136,239 @@ a:visited {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
 
   <script>
+   angular
+     .module('app', [
+       'ui.router'
+     ])
 
- angular
-  .module('app', [
-      'ui.router'
-    ])
-
-    .config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider, $stateProvider) {
-      $urlRouterProvider.otherwise('/');
-      $stateProvider
-        .state('home', {
-          url:"/",
-          templateUrl: 'http://192.168.0.110/home.htm',
-          controller:'temperatureCtrl',
+   .config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider, $stateProvider) {
+     $urlRouterProvider.otherwise('/');
+     $stateProvider
+       .state('home', {
+         url: "/",
+         templateUrl: '/home.htm',
+         controller: 'temperatureCtrl',
        })
-      .state('program', {
-        url:'/program',
-        templateUrl: 'http://192.168.0.110/program.htm',
-        controller:'alarmCtrl'
-      })
-      .state('config', {
-        url:'/config',
-        templateUrl: 'http://192.168.0.110/config.htm',
-        controller:'configCtrl'
-      })
-    }])
-  </script>
+       .state('program', {
+         url: '/program',
+         templateUrl: '/program.htm',
+         controller: 'alarmCtrl'
+       })
+       .state('config', {
+         url: '/config',
+         templateUrl: '/config.htm',
+         controller: 'configCtrl'
+       })
+   }])
+
+   .controller('temperatureCtrl', ["$scope", "$interval", "ArduinoService", function($scope, $interval, service) {
+     var autoRefresh;
+     $scope.channels = [];
+
+     function startRefresh() {
+       autoRefresh = $interval(function() {
+         updateAjax();
+       }, 5000);
+     }
+
+
+     function updateAjax() {
+       service.getChannels(function(err, result) {
+         if (err) {
+           return alert(err);
+         }
+         // puis les mets dans le scope
+         $scope.channels = result.channels;
+       })
+     };
+
+     $scope.init = function() { //on load page first get data
+       updateAjax();
+       startRefresh()
+     }
+
+
+     $scope.switchChannel = function($scope, channel) { // change name function
+       var switchCh = {
+         canal: $scope.canal,
+         status: $scope.status
+       }
+       service.switchChannel(switchCh, function() {});
+       updateAjax();
+     };
+
+     $scope.channelsClk = function($scope, channel) {
+       var chanObj = {
+         setPoint: $scope.setPoint,
+         name: $scope.name,
+         canal: $scope.canal
+       };
+       service.putChannels(chanObj, function() {});
+     }
+
+     $scope.stopRefresh = function() { //ng-mousedown
+       $interval.cancel(autoRefresh);
+     };
+
+     $scope.restartRefresh = function() {
+       startRefresh();
+     };
+
+     $scope.$on('$destroy', function() {
+       // Make sure that the interval is destroyed too
+       $scope.stopRefresh();
+     });
+   }])
+
+   .service('ArduinoService', ['$http', function($http) {
+     return {
+       getChannels: function(cb) {
+         $http.get('/ajax_inputs')
+           .success(function(result) {
+             cb(null, result);
+           });
+       },
+       switchChannel: function(switchCh, cb) {
+         $http.put('/switch', {
+             switchCh
+           })
+           .success(function(result) {
+             cb(null, true);
+           });
+       },
+
+       putChannels: function(channels, cb) {
+         $http.put('/channels', {
+             channels
+           })
+           .success(function(result) {
+             cb(null, true);
+           });
+       }
+     };
+   }])
+
+
+   .controller('alarmCtrl', ["$scope", "$timeout", "alarmService", function($scope, $timeout, service) {
+
+     $scope.alarms = [];
+     $scope.weekTypes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Week", "Week end", "All days"];
+
+     function update() {
+       service.getAlarms(function(err, result) {
+         if (err) {
+           return alert(err);
+         }
+         // puis les mets dans le scope
+         $scope.alarms = result.alarms;
+       })
+     };
+
+
+     $scope.init = function() { //on load page first get data
+       update();
+     };
+
+     $scope.switchAlarm = function($scope, alarm) { // change name function
+       var switchAlarm = {
+         switchAlarm: alarm
+       }
+       service.switchAlarm(switchAlarm, function() {});
+       update();
+     };
+
+     $scope.alarmsClk = function($scope, index) {
+       var chanObj = {
+         index: index,
+         data: $scope
+       };
+       service.putAlarms(chanObj, function() {});
+       $timeout(function() {
+         update()
+       }, 2000);
+     }
+   }])
+
+   .service('alarmService', ['$http', function($http) {
+     return {
+       getAlarms: function(cb) {
+         $http.get('/ajax_alarms')
+           .success(function(result) {
+             cb(null, result);
+           });
+       },
+       switchAlarm: function(switchAlarm, cb) {
+         $http.put('/switchAlarms', {
+             switchAlarm
+           })
+           .success(function(result) {
+             cb(null, true);
+           });
+       },
+
+       putAlarms: function(alarms, cb) {
+         $http.put('/alarms', {
+             alarms
+           })
+           .success(function(result) {
+             cb(null, true);
+           });
+       }
+     };
+   }])
+
+
+   .controller('configCtrl', ["$scope", "$timeout", "configService", function($scope, $timeout, service) {
+
+     $scope.configs = [];
+
+
+     function update() {
+       service.getConfigs(function(err, result) {
+         if (err) {
+           return alert(err);
+         }
+         // puis les mets dans le scope
+         $scope.configs = result.configs[0];
+       })
+     };
+
+     $scope.init = function() { //on load page first get data
+       update();
+     };
+
+
+     $scope.configClk = function(configs) {
+       var chanObj = configs;
+       console.log(chanObj)
+       service.putConfigs(chanObj, function() {});
+       $timeout(function() {
+         update()
+       }, 2000);
+     }
+   }])
+
+   .service('configService', ['$http', function($http) {
+     return {
+       getConfigs: function(cb) {
+         $http.get('/configs')
+           .success(function(result) {
+             cb(null, result);
+           });
+       },
+
+       putConfigs: function(config, cb) {
+         $http.put('/configs', {
+             config
+           })
+           .success(function(result) {
+             cb(null, true);
+           });
+       }
+     };
+   }])
+
+</script>
 
 </head>
   <header>
@@ -179,7 +386,7 @@ a:visited {
       <div ui-view></div>
     </div>
   </body>
-  <script src="http://192.168.0.110/home.jsx"></script>
-  <script src="http://192.168.0.110/program.jsx"></script>
-  <script src="http://192.168.0.110/config.jsx"></script>
+ <!-- <script src="/home.jsx"></script>
+  <script src="/program.jsx"></script>
+  <script src="/config.jsx"></script>  -->
 </html>
