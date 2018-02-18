@@ -73,7 +73,7 @@ Adc_Seqr adc;
 
 
 RTD10k RTDRead(RESO); //library to read 10k RTD input
-//    Per channel declare section Struct array
+//    Per channel declare section
 const byte numChannel = 10;
 RTDinChannels inChannelID[numChannel]; //input channel obj
 SSRoutput outChannelID[numChannel]; //ouput channel obj
@@ -115,7 +115,7 @@ void setupEthernet();
 void setupTime();
 void regulator_inputs();
 void regulator_outputs();
-void checkWekklyAlarm();
+void checkWeeklyAlarm();
 void RTDSetup();
 void setupOutput();
 void restore();
@@ -124,6 +124,7 @@ void restore();
 
 void setup() {
   Serial.begin(115200);
+  delay(1000);//for stability
 
   Serial.println("startup");
   setupSdCard();
@@ -132,13 +133,13 @@ void setup() {
   //Timer3.attachInterrupt(regulator_inputs).setFrequency(0.1).start(); // read inputs every 10 sec //-->move into interval methode
   timerMainRegulator.interval(sc(10),regulator_inputs);// read inputs every 10 sec
   Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //outputs regulator controler at 10 Hz
-  timerWeeklyAlarm.interval(mn(1),checkWekklyAlarm); //check weekly alarm each minute
+  timerWeeklyAlarm.interval(mn(1),checkWeeklyAlarm); //check weekly alarm each minute
   RTDSetup();
   setupOutput();
   setupWeeklyAlarm();
   restore(); //restoring data from sd card
   WDT_Restart (WDT); //reset the watchdog timer
-  delay(1000);
+  delay(1000);//for stability
 }
 
 //-----------------------------------------------------------

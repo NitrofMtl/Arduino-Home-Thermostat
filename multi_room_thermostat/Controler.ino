@@ -28,7 +28,7 @@ void inputRead() {
 
 //-----------------------------------------------------------
 
-void checkWekklyAlarm(){
+void checkWeeklyAlarm(){
   SPAlarm.handler();
 }
 

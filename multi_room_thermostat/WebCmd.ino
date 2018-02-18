@@ -8,12 +8,12 @@ JsonObject& JSONInputs(JsonBuffer& jsonBuffer) {
   JsonObject& channels = jsonBuffer.createObject();
   JsonArray& chan = channels.createNestedArray("channels");
 
-  for (byte i = 0; i < 10; i++) {
+  for (uint8_t i = 0; i < 10; i++) {
     JsonObject& chan_in = jsonBuffer.createObject();
     chan_in["name"] = inChannelID[i].channelName;
-    chan_in["canal"] = String(i);
+    chan_in["canal"] = i;
     chan_in["status"] = onOffBool(outChannelID[i].channelSwitch);
-    chan_in["temperature"] = double_with_n_digits(inChannelID[i].Ainput, 1);
+    chan_in["temperature"] = roundToDigit(inChannelID[i].Ainput, 1);
     chan_in["setPoint"] = outChannelID[i].sp;
     chan_in["permission"] = outChannelID[i].permRun;
     chan_in["percentOut"] = outChannelID[i].Aoutput;
@@ -49,17 +49,19 @@ void parseJSONInputs() {
 }
 
 void parseJSONswitch() {
+  Serial.println("jsonSwitch");
   StaticJsonBuffer<255> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
+  //root.prettyPrintTo(Serial);
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
   //root.prettyPrintTo(Serial); Serial.println("switch");
-  byte  chanId = root["switchCh"]["canal"];
+  uint8_t  chanId = root["switchCh"]["canal"]; 
   outChannelID[chanId].channelSwitch = !outChannelID[chanId].channelSwitch;
-  //Serial.println(chanId);
-  if (outChannelID[chanId].channelSwitch) Serial.println("true"); else  Serial.println("false");
+  //if (outChannelID[chanId].channelSwitch) Serial.println("true"); else  Serial.println("false");
+  
   backup();
 }
 
@@ -204,4 +206,11 @@ void parseJSONConfigs() {
   }
 
   backup();
+}
+
+
+double roundToDigit(double number, byte digit){
+  number = number * pow(10, digit);
+  number = round(number);
+  return number / pow(10, digit);
 }
