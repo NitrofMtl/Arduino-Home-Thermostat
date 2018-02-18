@@ -21,12 +21,14 @@ void setupSdCard() {
 
 void setupEthernet() {
   Ethernet.begin(mac, ip);
+  delay(500);
   Serial.print("Ip address; "); Serial.println(Ethernet.localIP());
   server.begin();
   uHTTPserver->begin();
   uHTTPserver->uHTTPclient(&response);   //link uHTTP EthernetClient with sketch EthernetClient
   uHTTPserver->addToContainer(uHTTP_METHOD_GET, getContainer, SizeOfArray(getContainer)); //add get request to uhttp handeler
   uHTTPserver->addToContainer(uHTTP_METHOD_PUT, putContainer, SizeOfArray(putContainer)); //add put request to uhttp handeler
+  delay(1000);
 }
 
 //-----------------------------------------------------------
