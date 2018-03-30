@@ -35,7 +35,9 @@ void checkWeeklyAlarm(){
 void setSp(int numAlarm) { //set setpoint coresponding to the alarm trigged
   for (byte i = 0; i < (numChannel); i++) {
     if (outChannelID[i].channelSwitch) {
-      outChannelID[i].sp = alarmMem[numAlarm][i];
+      if ( 5 < alarmMem[numAlarm][i]) { //add this condition to ignore 0 to keep setpoint to current setting
+        outChannelID[i].sp = alarmMem[numAlarm][i];
+      }      
     }
   }
   backup(); //save data after change apply

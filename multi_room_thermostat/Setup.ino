@@ -91,8 +91,8 @@ void setupWeeklyAlarm() {
 
 void init_alarmMemory() {   //initiane alarm memory matrix to 21C by default
   for (byte i = 0; i < numAlarm; i++) {
-    for (byte j = 0; j < numSetpoint; j++) {
-      alarmMem[i][j] = 21;
+    for (byte j = 0; j < numChannel; j++) {
+      alarmMem[i][j] = 0;
     }
   }
 }

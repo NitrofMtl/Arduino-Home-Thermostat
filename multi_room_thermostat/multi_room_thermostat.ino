@@ -89,8 +89,7 @@ Interval timerMainRegulator;
 Interval timerWeeklyAlarm;
 
 //programable alarm section
-byte numSetpoint = 10; //set number of setpoint save in conjuction with outchannel
-byte numAlarm = 10; // set the number of alarm
+const byte numAlarm = 10; // set the number of alarm
 WeeklyAlarm SPAlarm(numAlarm);//initiane 10 alarm
 float alarmMem[10][10];  // vector 1 = numAlarm, vector 2 = setpoint
 
@@ -124,11 +123,13 @@ void restore();
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);//for stability
+  //delay(1000);//for stability
 
   Serial.println("startup");
   setupSdCard();
   setupEthernet();
+  delay(1000);//for stability
+  WDT_Restart (WDT);
   setupTime();
   //Timer3.attachInterrupt(regulator_inputs).setFrequency(0.1).start(); // read inputs every 10 sec //-->move into interval methode
   timerMainRegulator.interval(sc(10),regulator_inputs);// read inputs every 10 sec
@@ -139,7 +140,7 @@ void setup() {
   setupWeeklyAlarm();
   restore(); //restoring data from sd card
   WDT_Restart (WDT); //reset the watchdog timer
-  delay(1000);//for stability
+  delay(200);//for stability
 }
 
 //-----------------------------------------------------------
@@ -152,9 +153,7 @@ void loop() {
   Interval::handler();
   //SPAlarm.handler(); // move into interval methode
   WDT_Restart (WDT); //reset the watchdog timer
-  delay(1);
+  //delay(1);
 }
 
 //-----------------------------------------------------------
-
-

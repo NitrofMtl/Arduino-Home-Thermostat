@@ -27,7 +27,7 @@ JsonObject& JSONbackup(JsonBuffer& jsonBuffer) {
   for (byte i = 0; i < 10; i++) {
     JsonObject& alarm_in = SPAlarm.backupAlarm(i, jsonBuffer);
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
-    for ( byte j = 0; j < numSetpoint; j++) {
+    for ( byte j = 0; j < numChannel; j++) {
       float setPointAl = alarmMem[i][j];
       setpoint.add(double_with_n_digits(setPointAl, 1));
     }

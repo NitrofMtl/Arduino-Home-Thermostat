@@ -58,10 +58,10 @@ void parseJSONswitch() {
     return;
   }
   //root.prettyPrintTo(Serial); Serial.println("switch");
-  uint8_t  chanId = root["switchCh"]["canal"]; 
+  uint8_t  chanId = root["switchCh"]["canal"];
   outChannelID[chanId].channelSwitch = !outChannelID[chanId].channelSwitch;
   //if (outChannelID[chanId].channelSwitch) Serial.println("true"); else  Serial.println("false");
-  
+
   backup();
 }
 
@@ -85,7 +85,7 @@ void parseJSONswitchAlarms() {
 JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
   JsonObject& alarm = jsonBuffer.createObject();
   JsonArray& chName = alarm.createNestedArray("chName");
-  for ( byte i = 0; i < numSetpoint; i++) {
+  for ( byte i = 0; i < numChannel; i++) {
     chName.add(inChannelID[i].channelName);
   }
   JsonArray& alarmID = alarm.createNestedArray("alarms");
@@ -103,7 +103,7 @@ JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
     alarm_in["minute"] = minAl;
 
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
-    for ( byte j = 0; j < numSetpoint; j++) {
+    for ( byte j = 0; j < numChannel; j++) {
       float setPointAl = alarmMem[i][j];
       setpoint.add(double_with_n_digits(setPointAl, 1));
     }
@@ -209,7 +209,7 @@ void parseJSONConfigs() {
 }
 
 
-double roundToDigit(double number, byte digit){
+double roundToDigit(double number, byte digit) {
   number = number * pow(10, digit);
   number = round(number);
   return number / pow(10, digit);
