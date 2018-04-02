@@ -105,7 +105,10 @@ JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
     for ( byte j = 0; j < numChannel; j++) {
       float setPointAl = alarmMem[i][j];
-      setpoint.add(double_with_n_digits(setPointAl, 1));
+      if ( 5 > setPointAl) {
+        setpoint.add(RawJson("null"));
+      }
+      else setpoint.add(double_with_n_digits(setPointAl, 1));
     }
     alarmID.add(alarm_in);
   }
@@ -142,7 +145,8 @@ void parseJSONalarms() {
   JsonArray& setpoints = root["alarms"]["data"]["setpoints"];
   byte i = 0;
   for (JsonArray::iterator it = setpoints.begin(); it != setpoints.end(); ++it) {
-    alarmMem[alarmID][i] = *it;
+    if (!*it) alarmMem[alarmID][i] = 0; //handle arduinoJson 'NaN'
+    else alarmMem[alarmID][i] = *it;
     i++;
   }
   backup();
