@@ -49,7 +49,6 @@ void parseJSONInputs() {
 }
 
 void parseJSONswitch() {
-  Serial.println("jsonSwitch");
   StaticJsonBuffer<255> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(uHTTPserver->body());
   //root.prettyPrintTo(Serial);

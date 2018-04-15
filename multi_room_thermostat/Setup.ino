@@ -40,7 +40,7 @@ void setupTime() {
     Serial.println("waiting for sync");
   }
   setClock(&Udp);
-  setSyncInterval(2592000);//sync clock once a mounth
+  setSyncInterval(86400000);//sync clock once a day
 }
 
 //-----------------------------------------------------------
@@ -49,17 +49,17 @@ void RTDSetup() {
   adc.begin(); //initiate sequencer, have to be before 'analogReadResolution' call to not reset it to 10
   analogReadResolution(RESO); //set arduino analog input to 12 bit reading
   /////         RTD inputs struct initializing
-  //InChannels[id](name, pin, switchCh, offset)
-  inChannelID[0].channelSet( "name0", A0, true, 0);
-  inChannelID[1].channelSet( "name1", A1, true, 0);
-  inChannelID[2].channelSet( "name2", A2, false, 0);
-  inChannelID[3].channelSet( "name3", A3, false, 0);
-  inChannelID[4].channelSet( "name4", A4, true, 0);
-  inChannelID[5].channelSet( "name5", A5, true, 0);
-  inChannelID[6].channelSet( "name6", A6, true, 0);
-  inChannelID[7].channelSet( "name7", A7, true, 0);
-  inChannelID[8].channelSet( "name8", A8, true, 0);
-  inChannelID[9].channelSet( "name9", A9, true, 0);
+  //InChannels[id](name, pin, offset(optionnal))
+  inChannelID[0].channelSet( "name0", A0 );
+  inChannelID[1].channelSet( "name1", A1 );
+  inChannelID[2].channelSet( "name2", A2 );
+  inChannelID[3].channelSet( "name3", A3 );
+  inChannelID[4].channelSet( "name4", A4 );
+  inChannelID[5].channelSet( "name5", A5 );
+  inChannelID[6].channelSet( "name6", A6 );
+  inChannelID[7].channelSet( "name7", A7 );
+  inChannelID[8].channelSet( "name8", A8 );
+  inChannelID[9].channelSet( "name9", A9 );
 }
 
 //-----------------------------------------------------------
@@ -68,7 +68,7 @@ void setupOutput() {
 
   /////        SSROutput initializing
   //  outChannels[id](ouputPin, Sp,treshold, ChSwitch)
-  outChannelID[0].OutChannels(22, 5, smm, true);
+  outChannelID[0].OutChannels(22, 5, smm, false);
   outChannelID[1].OutChannels(23, 5, smm, false);
   outChannelID[2].OutChannels(24, 5, smm, false);
   outChannelID[3].OutChannels(25, 5, smm, false);

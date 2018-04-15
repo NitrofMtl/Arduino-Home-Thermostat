@@ -82,11 +82,11 @@ SSRoutput outChannelID[numChannel]; //ouput channel obj
 byte K = 80; // set process gain 1 to 10
 float vs = 0.5; // set sustain value in degres
 float smm = 5; // treshold in pourcent
-//float calibOffset[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //calibration of Shield rRef resistor
 
 //interval instance
 Interval timerMainRegulator;
 Interval timerWeeklyAlarm;
+Interval timerSSROutput;
 
 //programable alarm section
 const byte numAlarm = 10; // set the number of alarm
@@ -123,24 +123,24 @@ void restore();
 
 void setup() {
   Serial.begin(115200);
-  //delay(1000);//for stability
 
   Serial.println("startup");
   setupSdCard();
   setupEthernet();
-  delay(1000);//for stability
+  delay(1000);//for stability, make time to internet sheild to set up
   WDT_Restart (WDT);
   setupTime();
-  //Timer3.attachInterrupt(regulator_inputs).setFrequency(0.1).start(); // read inputs every 10 sec //-->move into interval methode
-  timerMainRegulator.interval(sc(10),regulator_inputs);// read inputs every 10 sec
-  Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //outputs regulator controler at 10 Hz
-  timerWeeklyAlarm.interval(mn(1),checkWeeklyAlarm); //check weekly alarm each minute
+  timerMainRegulator.interval(sc(10), regulator_inputs); // read inputs every 10 sec
+  timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //check weekly alarm each minute
   RTDSetup();
   setupOutput();
   setupWeeklyAlarm();
   restore(); //restoring data from sd card
   WDT_Restart (WDT); //reset the watchdog timer
+  regulator_inputs(); //read inputs a first time before loop start
   delay(200);//for stability
+  //Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //---->>> moved to interval methode: outputs regulator controler at 10 Hz
+  timerSSROutput.interval(100, (regulator_outputs));  //outputs regulator controler at 10 Hz
 }
 
 //-----------------------------------------------------------
@@ -151,9 +151,7 @@ void loop() {
   //printTime();
   webServ();
   Interval::handler();
-  //SPAlarm.handler(); // move into interval methode
   WDT_Restart (WDT); //reset the watchdog timer
-  //delay(1);
 }
 
 //-----------------------------------------------------------
