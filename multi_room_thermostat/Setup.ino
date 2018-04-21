@@ -26,8 +26,8 @@ void setupEthernet() {
   server.begin();
   uHTTPserver->begin();
   uHTTPserver->uHTTPclient(&response);   //link uHTTP EthernetClient with sketch EthernetClient
-  uHTTPserver->addToContainer(uHTTP_METHOD_GET, getContainer, SizeOfArray(getContainer)); //add get request to uhttp handeler
-  uHTTPserver->addToContainer(uHTTP_METHOD_PUT, putContainer, SizeOfArray(putContainer)); //add put request to uhttp handeler
+  uHTTPserver->addToContainer(GET, getContainer, SizeOfArray(getContainer)); //add get request to uhttp handeler
+  uHTTPserver->addToContainer(PUT, putContainer, SizeOfArray(putContainer)); //add put request to uhttp handeler
   delay(1000);
 }
 

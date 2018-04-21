@@ -1,3 +1,5 @@
+
+
 /*
   Copyright (c) 15/04/2018
 
@@ -32,6 +34,9 @@
 #include <EthernetServer.h>
 #include <EthernetUdp2.h>
 //#include <EthernetUdp.h> //to use ethernet shield 1, mute EthernetUdp2.h and unmute EthernetUdp.h
+//#include <WebSockets.h>
+//#include <WebSocketsClient.h>
+//#include <WebSocketsServer.h>
 #include <TimeLib.h>
 #include <weeklyAlarm.h>
 #include <DueTimer.h>

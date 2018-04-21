@@ -14,7 +14,7 @@ JsonObject& JSONInputs(JsonBuffer& jsonBuffer) {
     chan_in["canal"] = i;
     chan_in["status"] = onOffBool(outChannelID[i].channelSwitch);
     chan_in["temperature"] = roundToDigit(inChannelID[i].Ainput, 1);
-    chan_in["setPoint"] = outChannelID[i].sp;
+    chan_in["setpoint"] = outChannelID[i].sp;
     chan_in["permission"] = outChannelID[i].permRun;
     chan_in["percentOut"] = outChannelID[i].Aoutput;
     chan.add(chan_in);
@@ -44,7 +44,7 @@ void parseJSONInputs() {
   //root.prettyPrintTo(Serial); Serial.println("inputs");  // for debug
   byte  chanId = root["channels"]["canal"];
   strcpy(inChannelID[chanId].channelName, root["channels"]["name"]);
-  outChannelID[chanId].sp = root["channels"]["setPoint"];
+  outChannelID[chanId].sp = root["channels"]["setpoint"];
   backup();
 }
 
