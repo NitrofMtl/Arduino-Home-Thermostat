@@ -1,5 +1,3 @@
-
-
 /*
   Copyright (c) 15/04/2018
 
@@ -34,9 +32,7 @@
 #include <EthernetServer.h>
 #include <EthernetUdp2.h>
 //#include <EthernetUdp.h> //to use ethernet shield 1, mute EthernetUdp2.h and unmute EthernetUdp.h
-//#include <WebSockets.h>
-//#include <WebSocketsClient.h>
-//#include <WebSocketsServer.h>
+#include "WebSocketsServer.h"
 #include <TimeLib.h>
 #include <weeklyAlarm.h>
 #include <DueTimer.h>
@@ -50,6 +46,7 @@
 #include <IOctrl.h>
 #include <ADC_SEQR.h>
 #include <Streaming.h>
+
 #define REQ_BUF_SZ   60   // size of buffer used to capture HTTP requests
 
 #define vRef 3.3   //set reference voltage to 3.3 or 5.0V
@@ -73,6 +70,8 @@ EthernetClient response;
 EthernetUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 EthernetServer server(80);
+
+WebSocketsServer webSocket = WebSocketsServer(8081);
 
 Adc_Seqr adc;
 
@@ -98,25 +97,14 @@ const byte numAlarm = 10; // set the number of alarm
 WeeklyAlarm SPAlarm(numAlarm);//initiane 10 alarm
 float alarmMem[10][10];  // vector 1 = numAlarm, vector 2 = setpoint
 
-uHTTP_request getContainer[] = {    //resquest index : (ID, callback function)
-  {"ajax_inputs", writeJSONResponse},
-  {"ajax_alarms", writeJSON_Alarm_Response},
-  {"configs", writeJSONConfigResponse}
-};
 
-uHTTP_request putContainer[] = {    //resquest index : (ID, callback function)
-  {"channels", parseJSONInputs},
-  {"alarms", parseJSONalarms},
-  {"switch", parseJSONswitch},
-  {"switchAlarms", parseJSONswitchAlarms},
-  {"configs", parseJSONConfigs}
-};
 
 
 //function prototype
 void setupSdCard();
 void setupEthernet();
 void setupTime();
+void setupWebSocket();
 void regulator_inputs();
 void regulator_outputs();
 void checkWeeklyAlarm();
@@ -129,9 +117,10 @@ void restore();
 void setup() {
   Serial.begin(115200);
 
-  Serial.println("startup");
+  Serial.println("startup  !!!");
   setupSdCard();
   setupEthernet();
+  setupWebSocket();
   delay(1000);//for stability, make time to internet sheild to set up
   WDT_Restart (WDT);
   setupTime();
@@ -155,6 +144,7 @@ void webServ();
 void loop() {
   //printTime();
   webServ();
+  webSocket.loop();
   Interval::handler();
   WDT_Restart (WDT); //reset the watchdog timer
 }

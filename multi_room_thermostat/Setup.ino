@@ -1,6 +1,5 @@
 //SETUP SD CARD
 void setupSdCard() {
-  Serial.println("Startup !!!");
   Serial.print("Initializing SD card...");
   pinMode(SDC_PIN, OUTPUT);  //make sure that the default chip select pin is set to output
   digitalWrite(SDC_PIN, HIGH);
@@ -16,7 +15,19 @@ void setupSdCard() {
 }
 
 //-----------------------------------------------------------
+uHTTP_request getContainer[] = {    //resquest index : (ID, callback function)
+  {"ajax_inputs", writeJSONResponse},
+  {"ajax_alarms", writeJSON_Alarm_Response},
+  {"configs", writeJSONConfigResponse}
+};
 
+uHTTP_request putContainer[] = {    //resquest index : (ID, callback function)
+  {"channels", parseJSONInputs},
+  {"alarms", parseJSONalarms},
+  {"switch", parseJSONswitch},
+  {"switchAlarms", parseJSONswitchAlarms},
+  {"configs", parseJSONConfigs}
+};
 
 
 void setupEthernet() {
@@ -32,6 +43,15 @@ void setupEthernet() {
 }
 
 //-----------------------------------------------------------
+/*
+void setupWebsocket() {
+  wsServer.setOnErrorCallback(onError);
+  wsServer.setOnOpenCallback(onOpen);
+  wsServer.setOnMessageCallback(onMessage);
+  wsServer.begin();
+}*/
+
+//-----------------------------------------------------------
 
 void setupTime() {
   server.begin();
@@ -39,11 +59,18 @@ void setupTime() {
   if (Serial.available() > 0) ; {
     Serial.println("waiting for sync");
   }
-  setClock(&Udp);
+  setClock();
+  printTime();
   setSyncInterval(86400000);//sync clock once a day
 }
 
 //-----------------------------------------------------------
+
+void setupWebSocket() {
+  webSocket.begin();
+  webSocket.onEvent(webSocketEvent);
+}
+
 
 void RTDSetup() {
   adc.begin(); //initiate sequencer, have to be before 'analogReadResolution' call to not reset it to 10
