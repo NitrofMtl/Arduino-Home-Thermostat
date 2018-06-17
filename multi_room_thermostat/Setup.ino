@@ -43,23 +43,17 @@ void setupEthernet() {
 }
 
 //-----------------------------------------------------------
-/*
-void setupWebsocket() {
-  wsServer.setOnErrorCallback(onError);
-  wsServer.setOnOpenCallback(onOpen);
-  wsServer.setOnMessageCallback(onMessage);
-  wsServer.begin();
-}*/
-
-//-----------------------------------------------------------
 
 void setupTime() {
   server.begin();
   Udp.begin(localPort);
-  if (Serial.available() > 0) ; {
-    Serial.println("waiting for sync");
+  if (Serial.available() > 0); 
+  Serial.println("waiting for sync");
+  while (!timeStatus()) {
+      setClock();
+      WDT_Restart (WDT);
   }
-  setClock();
+  
   printTime();
   setSyncInterval(86400000);//sync clock once a day
 }
@@ -69,9 +63,15 @@ void setupTime() {
 void setupWebSocket() {
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
+  //initialize suscriber matrix
+  for (int i = 0; i < WEBSOCKETS_SERVER_CLIENT_MAX; i++) {
+    for (int j = 0; j < SIZE_OF_ENUM; j++) {
+      suscribers[i][j] = false;
+    }
+  }
 }
 
-
+//-----------------------------------------------------------
 void RTDSetup() {
   adc.begin(); //initiate sequencer, have to be before 'analogReadResolution' call to not reset it to 10
   analogReadResolution(RESO); //set arduino analog input to 12 bit reading

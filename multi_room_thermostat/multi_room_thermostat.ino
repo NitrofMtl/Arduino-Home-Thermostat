@@ -72,6 +72,8 @@ unsigned int localPort = 8888;  // local port to listen for UDP packets
 EthernetServer server(80);
 
 WebSocketsServer webSocket = WebSocketsServer(8081);
+enum SuscriberPages { HOME, ALARMS, CONFIGS, SIZE_OF_ENUM };
+bool suscribers[WEBSOCKETS_SERVER_CLIENT_MAX][SIZE_OF_ENUM];
 
 Adc_Seqr adc;
 
@@ -91,6 +93,7 @@ float smm = 5; // treshold in pourcent
 Interval timerMainRegulator;
 Interval timerWeeklyAlarm;
 Interval timerSSROutput;
+Interval timerWebSocket[WEBSOCKETS_SERVER_CLIENT_MAX];
 
 //programable alarm section
 const byte numAlarm = 10; // set the number of alarm
@@ -113,6 +116,13 @@ void setupOutput();
 void restore();
 
 //-----------------------------------------------------------------
+extern "C" char* sbrk(int incr);
+
+int freeMemory() {
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+}
+//-----------------------------------------------------------------
 
 void setup() {
   Serial.begin(115200);
@@ -124,17 +134,23 @@ void setup() {
   delay(1000);//for stability, make time to internet sheild to set up
   WDT_Restart (WDT);
   setupTime();
+  WDT_Restart (WDT);
   timerMainRegulator.interval(sc(10), regulator_inputs); // read inputs every 10 sec
   timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //check weekly alarm each minute
   RTDSetup();
   setupOutput();
   setupWeeklyAlarm();
-  restore(); //restoring data from sd card
+  restore(); //restoring user data from sd card
   WDT_Restart (WDT); //reset the watchdog timer
   regulator_inputs(); //read inputs a first time before loop start
   delay(200);//for stability
+  WDT_Restart (WDT); //reset the watchdog timer
   //Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //---->>> moved to interval methode: outputs regulator controler at 10 Hz
   timerSSROutput.interval(100, (regulator_outputs));  //outputs regulator controler at 10 Hz
+
+  Serial.print ("Free memory is: ");
+  Serial.println (freeMemory ());
+
 }
 
 //-----------------------------------------------------------
