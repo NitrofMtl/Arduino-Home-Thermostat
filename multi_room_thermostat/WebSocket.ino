@@ -10,18 +10,18 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         //IPAddress ip = webSocket.remoteIP(num);
         Serial << num << " Connected: " << (char*)payload << endl;
         // send message to client
-        webSocket.sendTXT(num, "Connected");
+        //##webSocket.sendTXT(num, "Connected");
       }
       break;
     case WStype_TEXT:
-      Serial << num << " get Text: " << (char*)payload << endl;
+      //Serial << num << " get Text: " << (char*)payload << endl;
       parseMessage((char*)payload, num);
 
       // send message to client
-      webSocket.sendTXT(num, "message here");
+      //##webSocket.sendTXT(num, "message here");
 
       // send data to all connected clients
-      webSocket.broadcastTXT("broadcast message here");
+      //##webSocket.broadcastTXT("broadcast message here");
       break;
     case WStype_BIN:
       Serial << num << " get binary lenght: ";
@@ -40,7 +40,7 @@ void parseMessage(char* message, int num) {
     Serial.println("parseObject() failed");
     return;
   }
-  root.prettyPrintTo(Serial);  // for debug
+  //root.prettyPrintTo(Serial);  // for debug
   wsRequestHandler(root, num);
   
 }
@@ -65,37 +65,57 @@ bool noSuscriber(bool suscribed[]) {
 }
 
 void wsRequestHandler(JsonObject& root, int num) {
+  if (strcmp(root["request"], "put") ==0 ) { //handle put data request
+    Serial.println("receive put request !!!");
+    char data[100];
+    root["data"].printTo(data);
+    parsePutRequest(data);
+    return;
+  }
   for (int i = 0; i < SWSGC; i++){ //i for request index
     if( strcmp(root["request"], wsGetContainer[i].request) ==0 ) {
-      if ( strcmp(root["subscription"], "suscribe") ==0 ) {
+      if ( strcmp(root["data"], "suscribe") ==0 ) {
         //start sending data to client
         Serial.println("get subscription");
         suscribers[i][num] = true;
-        timerWebSocket[i].interval(1000, wsGetContainer[i].callback);
+        timerWebSocket[i].interval(250, wsGetContainer[i].callback);
       }
-      else if ( strcmp(root["subscription"], "unsuscribe") ==0 ) {
+      else if ( strcmp(root["data"], "unsuscribe") ==0 ) {
            //stop sending data to client
            Serial.println("get unSubscription");
            suscribers[i][num] = false;
            if (noSuscriber(suscribers[i])) timerWebSocket[i].cancel(); 
       }
     }
+    
   }
 }
 
 void wsSendDataConfigs() {
   regulator_inputs();//refresh analog readings
-  StaticJsonBuffer<2000> jsonBuffer;
-//  JsonObject& json = JSONconfigs(jsonBuffer);
+  StaticJsonBuffer<1000> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
   json["request"] = "configs";
-  json["data"] = JSONconfigs(jsonBuffer);
+
+  //create data:
+  StaticJsonBuffer<1000> dataBuffer;
+  JsonObject& data = JSONconfigs__Corrected(dataBuffer);
+  
+  //size_t sizeOfData = data.measureLength();
+  //Serial.print("                    size of databuffer:");
+  //Serial.println(sizeOfData);
+  
+  char dataString[550];
+  data.printTo(dataString);
+  //Serial.println(dataString);
+
+  json["data"] = dataString;
   char message[1000];
-  json.printTo(Serial);Serial.println();
+  //json.printTo(Serial);Serial.println();
   json.printTo(message);
-  char* testMessage = "{\"request\":\"configs\",\"subscription\":\"suscribe\"}";
+
   for (int i = 0; i < WEBSOCKETS_SERVER_CLIENT_MAX; i++) {
-    if (suscribers[CONFIGS][i]) webSocket.sendTXT(i,testMessage);//webSocket.sendTXT(i, message);
+    if (suscribers[CONFIGS][i]) webSocket.sendTXT(i, message);// from test  webSocket.sendTXT(i,testMessage);
   }  
 }
 
@@ -113,3 +133,37 @@ void cleanupDisconnected(int num){
   }
 }
 
+void parsePutRequest(char* data) {
+  Serial.println(data); //"{\"offset\":11,\"canal\":\"0\"}"
+  data = charTrim(data, '\\');
+  //Serial << "trimmed data: " << data << endl;
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(data);
+  
+  if (!root.success()) {
+    Serial.println("        parseObject() failed");
+    return;
+  }
+
+  int canal = root["canal"];
+  int offset = root["offset"];
+
+  inChannelID[canal].offset = offset;
+}
+
+
+
+char* charTrim(char* stringToTrim, char charsToTrim) {
+  String output;
+  String toTrim = String(stringToTrim);
+  for (int i = 0; i < toTrim.length(); i++) {
+    if (i == 0) continue; //skip the first char '"'
+    if (toTrim.charAt(i) != charsToTrim) {
+      output += toTrim.charAt(i);  
+    } 
+  }
+  return const_cast<char*>(output.c_str());
+//  char* buffer;
+//  output.toCharArray(buffer, output.length()+1);
+//  return buffer;
+}

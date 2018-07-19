@@ -154,7 +154,7 @@ void parseJSONalarms() {
 //-----------------------------------------------------------
 //-----------------------------------------------------------
 
-JsonObject& JSONconfigs(JsonBuffer& jsonBuffer) {
+JsonObject& JSONconfigs__deprecated(JsonBuffer& jsonBuffer) { //<<<<<<--------------------to be deprecated
   JsonObject& configs = jsonBuffer.createObject();
   JsonArray& config = configs.createNestedArray("configs");
   JsonObject& config_in = jsonBuffer.createObject();
@@ -176,10 +176,29 @@ JsonObject& JSONconfigs(JsonBuffer& jsonBuffer) {
   return configs;
 }
 
+JsonObject& JSONconfigs__Corrected(JsonBuffer& jsonBuffer) {
+  JsonObject& configs = jsonBuffer.createObject();
+  configs["K"] = K;
+  configs["vs"] = vs;
+  configs["smm"] = smm;
+
+  JsonArray& chan = configs.createNestedArray("inputs");
+  for (byte i = 0; i < numChannel; i++) {
+    JsonObject& chan_in = jsonBuffer.createObject();
+    chan_in["offset"] = inChannelID[i].offset;
+    chan_in["canal"] = String(i);
+    chan_in["temperature"] = inChannelID[i].Ainput;
+    chan.add(chan_in);
+  }
+
+  // configs.prettyPrintTo(Serial);
+  return configs;
+}
+
 void writeJSONConfigResponse() {
   inputRead(); // update all input reading more often for calibration
   StaticJsonBuffer<2000> jsonBuffer;
-  JsonObject& json = JSONconfigs(jsonBuffer);
+  JsonObject& json = JSONconfigs__deprecated(jsonBuffer); //<<<------ to be deprecated
   uHTTPserver->send_JSON_headers();
   json.printTo(response);
 }

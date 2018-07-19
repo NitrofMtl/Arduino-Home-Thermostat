@@ -107,6 +107,8 @@ void setupOutput() {
   outChannelID[9].OutChannels(31, 5, smm, false);
 }
 
+//-----------------------------------------------------------
+
 void setupWeeklyAlarm() {
   init_alarmMemory();
   //set alarm: (id, type, almSwitch, Hour, Min, callback)

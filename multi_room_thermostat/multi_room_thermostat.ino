@@ -71,9 +71,9 @@ EthernetUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 EthernetServer server(80);
 
-WebSocketsServer webSocket = WebSocketsServer(8081);
+WebSocketsServer webSocket = WebSocketsServer(8181);
 enum SuscriberPages { HOME, ALARMS, CONFIGS, SIZE_OF_ENUM };
-bool suscribers[WEBSOCKETS_SERVER_CLIENT_MAX][SIZE_OF_ENUM];
+bool suscribers   [ WEBSOCKETS_SERVER_CLIENT_MAX][SIZE_OF_ENUM   ]  ;
 
 Adc_Seqr adc;
 
