@@ -66,7 +66,7 @@ void setupWebSocket() {
   //initialize suscriber matrix
   for (int i = 0; i < WEBSOCKETS_SERVER_CLIENT_MAX; i++) {
     for (int j = 0; j < SIZE_OF_ENUM; j++) {
-      suscribers[i][j] = false;
+      subscribers[i][j] = false;
     }
   }
 }
