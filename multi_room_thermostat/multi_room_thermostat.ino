@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 15/04/2018
+  Copyright (c) 02/08/2018
 
     By Nitrof
 
@@ -21,21 +21,14 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 #include <SD.h>
 #include <SPI.h>
-#include <Dhcp.h>
-#include <Dns.h>
-#include <Ethernet2.h>
-//#include <Ethernet.h> //to use ethernet shield 1, mute ethernet2.h and unmute ethernet.h
-#include <EthernetClient.h>
-#include <EthernetServer.h>
-#include <EthernetUdp2.h>
-//#include <EthernetUdp.h> //to use ethernet shield 1, mute EthernetUdp2.h and unmute EthernetUdp.h
+#include <Ethernet.h>
+#include <EthernetUdp.h>
 #include "WebSocketsServer.h"
 #include <TimeLib.h>
 #include <weeklyAlarm.h>
-#include <DueTimer.h>
+//#include <DueTimer.h> //not used in this controler
 #include <TimeOut.h>
 //#include <currentSwitch.h>  //not used in this controler
 //#include <Bounce2.h> //not used in this controler
@@ -73,7 +66,7 @@ EthernetServer server(80);
 
 WebSocketsServer webSocket = WebSocketsServer(8181);
 enum SubscriberPages { HOME, ALARMS, CONFIGS, SIZE_OF_ENUM };
-bool subscribers   [ WEBSOCKETS_SERVER_CLIENT_MAX][SIZE_OF_ENUM   ]  ;
+bool subscribers   [WEBSOCKETS_SERVER_CLIENT_MAX][SIZE_OF_ENUM]  ;
 
 Adc_Seqr adc;
 

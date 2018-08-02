@@ -7,14 +7,14 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
       break;
     case WStype_CONNECTED:
       {
-        //IPAddress ip = webSocket.remoteIP(num);
-        Serial << num << " Connected: " << (char*)payload << endl;
+        IPAddress ip = webSocket.remoteIP(num);
+        Serial << num << " Connected: " << ip << " " << (char*)payload << endl;
         // send message to client
         //##webSocket.sendTXT(num, "Connected");
       }
       break;
     case WStype_TEXT:
-      //Serial << num << " get Text: " << (char*)payload << endl;
+      Serial << num << " get Text: " << (char*)payload << endl;
       parseMessage((char*)payload, num);
 
       // send message to client
@@ -33,16 +33,16 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
 }
 
 void parseMessage(char* message, int num) {
-    StaticJsonBuffer<200> jsonBuffer;
+  StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(message);
-  
+
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
   //root.prettyPrintTo(Serial);  // for debug
   wsRequestHandler(root, num);
-  
+
 }
 
 struct WsContainer {
@@ -53,15 +53,27 @@ struct WsContainer {
 };
 
 WsContainer wsGetContainer[] = {    //resquest index : (ID, callback function)
-  {"ajax_inputs", HOME, writeJSONResponse, 1000},
+  {"ajax_inputs", HOME, wsSubscribeDataHome, 10000},
   {"ajax_alarms", ALARMS, writeJSON_Alarm_Response, 0},
   {"configs", CONFIGS, wsSendDataConfigs, 250}
 };
 #define SWSGC SizeOfArray(wsGetContainer) //Size of websocket get container
 
+struct Object {
+  const char* id;
+  void (*parse)(JsonObject& data);
+};
+
+Object wsPutContainer[] = {
+  { "setpointPut", wsParseHomePutSetpoint  },
+  { "homeSwitch", wsParseHomeSwitch},
+  { "offsetPut", parseConfigsPutRequest}
+};
+#define SWSPC SizeOfArray(wsPutContainer) //Size of websocket put container*/
+
 bool noSubscriber(bool subscribed[]) {
   for (int i = 0; i < sizeof(subscribed); i++) {
-    if(subscribed[i]) return false;
+    if (subscribed[i]) return false;
   }
 }
 
@@ -75,30 +87,42 @@ void wsRequestHandler(JsonObject& root, int num) {
   else if (strncmp(root["request"], "uns", 3) == 0 ) requestT = UNSUBSCRIBE;
   else if (strncmp(root["request"], "con", 3) == 0 ) requestT = CONSOLE_LOG;
 
-  switch(requestT) {
+  switch (requestT) {
     case GETWS:
       Serial.println("receive get request !!!");
-        //root["data"] to do parse get data
-    break;
+      //root["data"] to do parse get data
+      for (int i = 0; i < SWSGC; i++) { //i for request index
+        if ( strcmp(root["id"], wsGetContainer[i].id) == 0 ) {
+          wsGetContainer[i].callback();
+        }
+      }
+      break;
     case PUTWS:
       Serial.println("receive put request !!!");
-      parsePutRequest(root["data"]);
+      for (int i = 0; i < SWSPC; i++) { //i for request index
+        if ( strcmp(root["id"], wsPutContainer[i].id) == 0 ) {
+          Serial << "found put request: " << wsPutContainer[i].id << endl;
+          wsPutContainer[i].parse(root["data"]);
+          backup(); //store any change data
+        }
+      }
       break;
     case SUBSCRIBE:
-      for (int i = 0; i < SWSGC; i++){ //i for request index
-        if( strcmp(root["id"], wsGetContainer[i].id) == 0 ) {
+      for (int i = 0; i < SWSGC; i++) { //i for request index
+        if ( strcmp(root["id"], wsGetContainer[i].id) == 0 ) {
           //start sending data to client
-          Serial.println("get subscription");
+          Serial.println("get subscribtion");
           subscribers[i][num] = true;
           timerWebSocket[i].interval(wsGetContainer[i].intervalTime, wsGetContainer[i].callback);
+          wsGetContainer[i].callback(); // do callback once to update data immediately
         }
       }
       break;
     case UNSUBSCRIBE:
-      for (int i = 0; i < SWSGC; i++){ //i for request index
-        Serial.println("get unSubscription");
+      for (int i = 0; i < SWSGC; i++) { //i for request index
+        if (subscribers[i][num]) Serial << ("get unSubscribtion: Socket #") << i << endl;
         subscribers[i][num] = false;
-        if (noSubscriber(subscribers[i])) timerWebSocket[i].cancel(); 
+        if (noSubscriber(subscribers[i])) timerWebSocket[i].cancel();
       }
       break;
     case CONSOLE_LOG:
@@ -108,31 +132,56 @@ void wsRequestHandler(JsonObject& root, int num) {
       break;
   }
 }
-/*
-void wsRequestHandler(JsonObject& root, int num) {
-  if (strcmp(root["request"], "put") ==0 ) { //handle put data request
-    Serial.println("receive put request !!!");
-    parsePutRequest(root["data"]);
-    return;
-  }
-  for (int i = 0; i < SWSGC; i++){ //i for request index
-    if( strcmp(root["id"], wsGetContainer[i].id) == 0 ) {
-      if ( strcmp(root["request"], "suscribe") == 0 ) {
-        //start sending data to client
-        Serial.println("get subscription");
-        suscribers[i][num] = true;
-        timerWebSocket[i].interval(250, wsGetContainer[i].callback);
-      }
-      else if ( strcmp(root["request"], "unsuscribe") ==0 ) {
-           //stop sending data to client
-           Serial.println("get unSubscription");
-           suscribers[i][num] = false;
-           if (noSuscriber(suscribers[i])) timerWebSocket[i].cancel(); 
+
+void cleanupDisconnected(int num) {
+  Serial.println("clean disconnect");
+  for (int i = 0; i < SWSGC; i++) { //i for request index
+    if ( subscribers[i][num] ) {
+      Serial.println("found subscribed");
+      subscribers[i][num] = false;//unsuscribe to any get request for disconnected client
+      if (noSubscriber(subscribers[i])) {
+        timerWebSocket[i].cancel();
+        Serial.println("clean interval");
       }
     }
-    
   }
-}*/
+}
+
+//-----------------------------------------------------------
+
+char* sendDataHome() {
+  StaticJsonBuffer<3000> jsonBuffer;
+  JsonObject& json = JSONInputs(jsonBuffer);
+  char message[3000];
+  json.printTo(message);
+  return message;
+}
+
+void wsSubscribeDataHome() {
+  for (int i = 0; i < WEBSOCKETS_SERVER_CLIENT_MAX; i++) {
+    if (subscribers[HOME][i]) {
+      webSocket.sendTXT(i, sendDataHome());
+    }
+  }
+}
+
+void wsParseHomeSwitch(JsonObject& data) {
+
+  //root.prettyPrintTo(Serial);
+  uint8_t  chanId = data["switchCh"]["canal"];
+  outChannelID[chanId].channelSwitch = !outChannelID[chanId].channelSwitch;
+  //if (outChannelID[chanId].channelSwitch) Serial.println("true"); else  Serial.println("false");
+}
+
+void wsParseHomePutSetpoint(JsonObject& data) {
+  //data.prettyPrintTo(Serial);  // for debug
+  byte  chanId = data["canal"];
+  strcpy(inChannelID[chanId].channelName, data["name"]);
+  outChannelID[chanId].sp = data["setpoint"];
+}
+
+//-----------------------------------------------------------
+
 
 void wsSendDataConfigs() {
   regulator_inputs();//refresh analog readings
@@ -151,29 +200,17 @@ void wsSendDataConfigs() {
   //Serial << message << endl;
 
   for (int i = 0; i < WEBSOCKETS_SERVER_CLIENT_MAX; i++) {
-    if (subscribers[CONFIGS][i]) { 
+    if (subscribers[CONFIGS][i]) {
       webSocket.sendTXT(i, message);// from test  webSocket.sendTXT(i,testMessage);
-    }
-  }  
-}
-
-void cleanupDisconnected(int num){
-  Serial.println("clean disconnect");
-  for (int i = 0; i < SWSGC; i++){ //i for request index
-    if ( subscribers[i][num] ) {
-      Serial.println("found subscribed");
-      subscribers[i][num] = false;//unsuscribe to any get request for disconnected client
-      if (noSubscriber(subscribers[i])) {
-        timerWebSocket[i].cancel(); 
-        Serial.println("clean interval");
-      }
     }
   }
 }
 
-void parsePutRequest(JsonObject& data) {
+void parseConfigsPutRequest(JsonObject& data) {
   //data.printTo(Serial);
   int canal = data["canal"];
   int offset = data["offset"];
   inChannelID[canal].offset = offset;
 }
+
+//-----------------------------------------------------------
