@@ -1,0 +1,1 @@
+The source files of the arduino thermostat Ionic app can be found at this repo: https://github.com/NitrofMtl/underdev-arduino-thermostat

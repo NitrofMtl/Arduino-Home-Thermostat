@@ -120,7 +120,7 @@ void wsRequestHandler(JsonObject& root, int num) {
       break;
     case UNSUBSCRIBE:
       for (int i = 0; i < SWSGC; i++) { //i for request index
-        if (subscribers[i][num]) Serial << ("get unSubscribtion: Socket #") << i << endl;
+        if (subscribers[i][num]) Serial << ("unSubscribtion: Socket #") << num << endl;
         subscribers[i][num] = false;
         if (noSubscriber(subscribers[i])) timerWebSocket[i].cancel();
       }
