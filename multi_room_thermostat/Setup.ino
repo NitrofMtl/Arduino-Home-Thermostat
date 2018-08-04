@@ -44,11 +44,25 @@ void setupEthernet() {
 
 //-----------------------------------------------------------
 
+//IPAddress timeserver;
+IPAddress hostByName(const char* hostName) {
+  IPAddress aResult = static_cast<uint32_t>(0);
+  if(aResult.fromString(hostName)) {
+        // Host name is a IP address use it!
+        return aResult;
+    }
+  DNSClient c;
+  c.begin(Ethernet.dnsServerIP());
+  c.getHostByName(hostName, aResult);
+  return aResult;
+}
+
 void setupTime() {
   server.begin();
   Udp.begin(localPort);
   if (Serial.available() > 0); 
   Serial.println("waiting for sync");
+  timeIp(hostByName(ntpHostName));
   while (!timeStatus()) {
       setClock();
       WDT_Restart (WDT);

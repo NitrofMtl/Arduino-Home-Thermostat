@@ -23,6 +23,7 @@
 
 #include <SD.h>
 #include <SPI.h>
+#include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 #include "WebSocketsServer.h"
@@ -63,6 +64,8 @@ EthernetClient response;
 EthernetUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 EthernetServer server(80);
+
+const char* ntpHostName = "0.ca.pool.ntp.org";
 
 WebSocketsServer webSocket = WebSocketsServer(8181);
 enum SubscriberPages { HOME, ALARMS, CONFIGS, SIZE_OF_ENUM };
