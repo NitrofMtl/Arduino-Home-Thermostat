@@ -66,6 +66,9 @@ unsigned int localPort = 8888;  // local port to listen for UDP packets
 EthernetServer server(80);
 
 const char* ntpHostName = "0.ca.pool.ntp.org";
+#define syncInterval hr(24) //sync ntp time once a day
+time_t runSince;
+time_t lastNtpSync;
 
 WebSocketsServer webSocket = WebSocketsServer(8181);
 enum SubscriberPages { HOME, ALARMS, CONFIGS, SIZE_OF_ENUM };

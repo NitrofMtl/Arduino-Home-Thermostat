@@ -171,8 +171,8 @@ JsonObject& JSONconfigs__deprecated(JsonBuffer& jsonBuffer) { //<<<<<<----------
     chan_in["temperature"] = inChannelID[i].Ainput;
     chan.add(chan_in);
   }
-
-  // configs.prettyPrintTo(Serial);
+  configs["systemTime"] = systemTime(jsonBuffer);
+  //configs.prettyPrintTo(Serial);
   return configs;
 }
 
@@ -190,9 +190,18 @@ JsonObject& JSONconfigs__Corrected(JsonBuffer& jsonBuffer) {
     chan_in["temperature"] = inChannelID[i].Ainput;
     chan.add(chan_in);
   }
+  configs["systemTime"] = systemTime(jsonBuffer);
 
-  // configs.prettyPrintTo(Serial);
+  //configs.prettyPrintTo(Serial);
   return configs;
+}
+
+JsonObject& systemTime(JsonBuffer& jsonBuffer) {
+  JsonObject& time = jsonBuffer.createObject();
+  time["now"] = now();
+  time["runSince"] = runSince;
+  time["lastSync"] = lastNtpSync;
+  return time;
 }
 
 void writeJSONConfigResponse() {

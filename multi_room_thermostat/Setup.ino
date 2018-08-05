@@ -57,20 +57,45 @@ IPAddress hostByName(const char* hostName) {
   return aResult;
 }
 
+bool setClock() {
+  IPAddress ntpAddr = hostByName(ntpHostName);
+  if (ntpAddr) {
+    time_t getTime = getNtpTime(ntpAddr);
+    if (getTime) {
+      setTime(getTime);
+      return true;
+    }
+  }
+}
+
+Interval clkSync;
+
+void syncTime() {
+  if (setClock) {
+    lastNtpSync = now();
+  }
+}
+
 void setupTime() {
   server.begin();
   Udp.begin(localPort);
   if (Serial.available() > 0); 
   Serial.println("waiting for sync");
-  timeIp(hostByName(ntpHostName));
-  while (!timeStatus()) {
-      setClock();
+  
+   do {
+      setClock();  
       WDT_Restart (WDT);
-  }
+  }while (!timeStatus());
   
   printTime();
-  setSyncInterval(86400000);//sync clock once a day
+  runSince = now();
+  lastNtpSync = now();
+  digitalClockDisplay(now(), Serial);
+  clkSync.interval(syncInterval, syncTime);
+  //setSyncInterval(86400000);//sync clock once a day
 }
+
+
 
 //-----------------------------------------------------------
 
