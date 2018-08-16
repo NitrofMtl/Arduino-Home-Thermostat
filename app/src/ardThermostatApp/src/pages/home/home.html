@@ -1,0 +1,29 @@
+<!--
+  Generated template for the HomePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Home</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content pager>
+  <ion-slides>
+
+    <ion-slide pager="true" *ngFor="let channel of channels" style="background-color: #efeff5d0">
+
+      <vertical-channel *ngIf="screenVertical" [channel]="channel" (switchClick)="switchChannel($event)"
+          (sliderChange)="putSetpoint($event)"></vertical-channel>
+
+      <horizontal-channel *ngIf="!screenVertical" [channel]="channel" (switchClick)="switchChannel($event)"
+          (sliderChange)="putSetpoint($event)"></horizontal-channel>
+      
+    </ion-slide>
+  </ion-slides>
+</ion-content>8mn  

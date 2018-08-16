@@ -1,0 +1,22 @@
+.ios, .md, .wp {
+
+    page-home {
+        ion-content, div, body {
+            height: 97%;
+            width: 100%;
+        }
+
+        .scroll-content {
+            display: flex;
+            flex-direction: column;
+            ion-slides {
+                display: flex;
+            }
+        }
+
+    }
+}
+
+
+
+

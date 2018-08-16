@@ -1,0 +1,71 @@
+<!--
+  Generated template for the ScedulePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Schedule</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div *ngIf="alarms">
+    <ion-slides pager class="slide-container">
+      <ion-slide class="scroll-content" pager="true" *ngFor="let alarm of alarms.alarms; let i = index" style="background-color: #efeff5d0">
+        <ion-item>
+          <ion-label>#{{i}}</ion-label>
+          <ion-toggle (ionChange)="switch(i)" [(ngModel)]="alarm.switch"></ion-toggle>
+        </ion-item>
+        <div class="clockselect">
+          <label>Type:</label>
+          <select [(ngModel)]="alarm.type" style="font-size: 20px">
+            <option value="Sunday">Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Thuesday">Thuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Week">Week</option>
+            <option value="Weekend">Weekend</option>
+            <option value="All days">All days</option>
+          </select>
+          <span class="clockZone">
+            <ion-select [(ngModel)]="alarm.hour">
+              <ion-option *ngFor="let Hour of hours">{{Hour}}</ion-option>
+            </ion-select>
+            <h3>:</h3>
+            <ion-select [(ngModel)]="alarm.minute">
+              <ion-option *ngFor="let Min of mins">{{Min}}</ion-option>
+            </ion-select>
+          </span>
+        </div>
+        <div class="columForButton">
+          <ion-list class="setpointList">
+            <div *ngFor="let setpoint of alarm.setpoints; let j = index" class="myRadio">
+              <label float="fixed">
+                <span class="listName">
+                    {{alarms.chName[j]}}
+                </span>
+                <span class="listTemp">
+                    {{alarm.setpoints[j]}}{{spanCelcius(i,j)}}
+                </span>
+              </label>
+              <ion-radio float-left [checked]="channnelChecked[j]" value="j" (ionSelect)="radioClk(j)">\xB0C</ion-radio>
+            </div>
+          </ion-list>
+          <div class="buttonColum">
+            <button class="button-onoff" (tap)="tapPlus(i)" ion-long-press [interval]="100"  (onPressing)="tapPlus(i)">+</button>
+            <button class="btnOK" (tap)="tapOk(i)" >Ok</button>
+            <button class="button-onoff" (tap)="tapMinus(i)" ion-long-press [interval]="100"  (onPressing)="tapMinus(i)">-</button>
+          </div>
+        </div>
+      </ion-slide>
+    </ion-slides>
+  </div>
+</ion-content>

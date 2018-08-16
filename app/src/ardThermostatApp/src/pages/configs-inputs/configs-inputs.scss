@@ -1,0 +1,17 @@
+.ios, .md, .wp {
+    page-configs-inputs {
+        ion-content {
+            ion-list {
+                div {
+                    display: flex;
+                    text-align: center;
+                    justify-content: space-around;
+                    .h3offset {
+                        //align-content: flex-end;
+
+                    }
+                }
+            }
+        }
+    }
+}

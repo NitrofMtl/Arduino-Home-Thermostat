@@ -1,0 +1,61 @@
+<!--
+  Generated template for the ConfigsServerPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>configs/server</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <div class="mainContainer" *ngIf="server.server">
+    <h1>Server configuration</h1>
+
+    <ion-list>
+
+      <ion-item>
+        <ion-label fixed>Local URL</ion-label>
+        <ion-input type="text" [(ngModel)]="server.server.localURL"></ion-input>
+      </ion-item>
+      <p>
+        Local URL can only be reach with local WI-FI connection.
+      </p>
+
+      <ion-item>
+        <ion-label stacked>Remote URL http://</ion-label>
+        <ion-input type="text" [(ngModel)]="server.server.remoteURL"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Remote port :</ion-label>
+        <ion-input type="number" [(ngModel)]="server.server.remotePort" on-return="returnKeyboard()"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Websocket port :</ion-label>
+        <ion-input type="number" [(ngModel)]="server.server.websocketPort" on-return="returnKeyboard()"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Connection over internet</ion-label>
+        <ion-toggle (ionChange)="server.putServer()" [(ngModel)]="server.server.useRemote"></ion-toggle>
+      </ion-item>
+      <div class="button-sidebyside">
+        <button ion-button large (tap)="server.putServer()">ok</button>
+        <button ion-button large (tap)="server.reset();">reset</button>
+      </div>
+
+      <p>
+        Remote URL can be accessed anywhere over the internet. You have to set your rooter to accept remote connection with virtual
+        server. Also, if you do not use DNS service, local internet IP is subject to change periodically, depending of your
+        internet provider.
+      </p>
+
+
+    </ion-list>
+  </div>
+
+</ion-content>

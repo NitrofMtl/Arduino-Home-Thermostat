@@ -87,7 +87,7 @@ void setupTime() {
       WDT_Restart (WDT);
   }while (!timeStatus());
   
-  printTime();
+  //printTime();
   runSince = now();
   lastNtpSync = now();
   digitalClockDisplay(now(), Serial);

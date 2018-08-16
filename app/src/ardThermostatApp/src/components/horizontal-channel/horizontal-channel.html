@@ -1,0 +1,35 @@
+<!-- Generated template for the HorizontalChannelComponent component -->
+
+<div class="flex-container">
+  <div class="flex-container-row">
+    <h2 class="title-top"> {{channel.name}} </h2>
+    <div class="top75">
+      <button class="button-onoff" (click)='parentSwitchChannel($event, channel);'>
+        {{channel.status}}
+      </button>
+    </div>
+  </div>   
+    <ion-item>
+      <div class="slidecontainer">
+        <label class="sliderLabel">
+          <h1>{{channel.temperature}} \xB0C</h1>
+          <div>Setpoint:</div>
+          <div>{{channel.setpoint}} \xB0C</div>
+        </label>
+        <div class="sliderMinMax">
+          <p class="lowTemp">15</p>
+          <p class="hiTemp">30</p>
+        </div>
+        <input type="range" #inputRange min="15" max="30" list="tickmarks" [(ngModel)]="channel.setpoint" step="0.5" class="slider"
+          (input)="parentSliderInput($event)" (change)="parentPutSetpoint($event, channel, inputRange.value)">
+        <datalist id="tickmarks">
+          <option value="15">
+            <option value="20" label="20">
+              <option value="25">
+        </datalist>
+      </div>
+    </ion-item>
+  </div>
+
+
+  

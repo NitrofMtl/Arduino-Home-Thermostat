@@ -1,0 +1,36 @@
+.ios, .md, .wp {
+    page-configs-system {
+        h1 {
+            text-align: center;
+            font-size: 225%;
+            padding-bottom: 15px;
+        }
+
+        .mainContainer{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 175%;
+            background-color: rgb(238, 239, 240);
+            border-radius: 5%;
+            
+        }
+
+        h3 {
+            color: rgb(48, 47, 47);
+            width: 75px;
+            text-align: center;
+        }
+
+        .selector{
+            display: flex;
+            justify-content: space-around;
+            background-color: rgb(252, 244, 224);
+        }
+
+    }
+}

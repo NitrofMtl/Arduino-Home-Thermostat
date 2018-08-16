@@ -1,0 +1,44 @@
+<!--
+  Generated template for the ConfigsSystemPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>configs/system</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>        
+  <div class="mainContainer" *ngIf="configs">
+    <h1 class="section"> Main controler setup </h1>
+    <ion-list>System time:    {{systemClock.toLocaleString('en-ca', { timeZone: 'UTC' })}}</ion-list>
+    <ion-list>Run Since:      {{systemRunSince.toLocaleString('en-ca', { timeZone: 'UTC' })}}</ion-list>
+    <ion-list>Last NTP sync:  {{systemLastNtpSync.toLocaleString('en-ca', { timeZone: 'UTC' })}}</ion-list>  
+    <h2>Gain</h2>
+    <div class="selector">        
+        <button ion-button round color="coolbutton" (click)="cbMinusGain()">-</button>
+        <h3>{{configs.K}}</h3>
+        <button ion-button round color="coolbutton" (click)="cbPlusGain()">+</button>
+    </div>
+    <h2>Threshold</h2>
+    <div class="selector">        
+        <button ion-button round color="coolbutton" (click)="cbMinusThresold()">-</button>
+        <h3>{{configs.smm}}%</h3>
+        <button ion-button round color="coolbutton" (click)="cbPlusThresold()">+</button>
+    </div>
+    <h2>Sustain value</h2>
+    <div class="selector">        
+        <button ion-button round color="coolbutton" (click)="cbMinusSV()">-</button>
+        <h3>{{configs.vs}}</h3>
+        <button ion-button round color="coolbutton" (click)="cbPlusSV()">+</button>
+    </div>
+    <button ion-button full large color="light" (click)="cbOk()">
+        OK
+    </button>
+  </div>
+</ion-content>
