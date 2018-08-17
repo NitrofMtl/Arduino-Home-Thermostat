@@ -45,7 +45,7 @@ export class ConfigsInputsPage {
     this.socket.connect();
     this.subscribtion =  this.socket.message.subscribe(msg => {
       let configs = <Configs>msg.data;
-      console.log(configs); 
+      //console.log(configs); 
       this.inputs = configs.inputs;
     });
     setTimeout(() => {

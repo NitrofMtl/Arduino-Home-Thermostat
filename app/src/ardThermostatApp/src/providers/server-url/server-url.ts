@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NativeStorage } from '@ionic-native/native-storage';
-
+import { Platform } from 'ionic-angular';
 import { ServerURL } from '../../pages/configs/server';
 
 /*
@@ -20,7 +20,9 @@ export class ServerUrlProvider {
     websocketPort: "0000"
   }
 
-  constructor(private nativeStorage: NativeStorage) {
+  winStorage = window.localStorage;
+
+  constructor(private nativeStorage: NativeStorage, private platform: Platform) {
     console.log('Hello ServerUrlProvider Provider');
   }
 
@@ -42,12 +44,22 @@ export class ServerUrlProvider {
     else {
       this.server.URL = ('http://' + this.server.remoteURL + ':' + this.server.remotePort);
     }
-    this.nativeStorage.setItem('serverData', this.server);
+    if (this.platform.is('core')) {
+      //console.log("id windows platform");
+      this.winStorage.setItem('serverData', JSON.stringify(this.server));
+    } else {
+      this.nativeStorage.setItem('serverData', this.server);
+    }
   }
 
   getServer() {
     return new Promise((res, err) => {
       setTimeout(() => {
+        if (this.platform.is('core')  || this.platform.is('mobileweb')){
+          //console.log("id windows platform");
+          let data = JSON.parse(this.winStorage.getItem('serverData'));
+            if (data) this.server = data;
+        } else {
         this.nativeStorage.getItem('serverData')
           .then(
           data => {
@@ -55,6 +67,7 @@ export class ServerUrlProvider {
             res();
           },
           err => console.error('get server data from native storage fail'+ err))
+        }
       }, 0);
     });
   }

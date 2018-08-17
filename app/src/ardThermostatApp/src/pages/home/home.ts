@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { IonicPage, NavController } from 'ionic-angular';
 
 import 'rxjs/add/operator/map';
@@ -27,12 +27,15 @@ export class HomePage {
 
   private screenOrientation: ScreenOrientation;
 
-  constructor(public nav: NavController, screenOrientation: ScreenOrientation, private socket: SocketProvider, private platform: Platform) {
+  constructor(public nav: NavController, screenOrientation: ScreenOrientation, private socket: SocketProvider, private platform: Platform, @Inject('server') private server) {
     console.log("Hello home page");
     document.addEventListener('pause', () => {
       if(this.activePage) {
-        this.socket.message.next(this.quitMessage);
-        this.subscribtion.unsubscribe();
+        let server = this.server.webSocketUrl();
+        if (server !== "ws://Not set:0000") {
+          this.socket.message.next(this.quitMessage);
+          this.subscribtion.unsubscribe();
+        }
       }      
     });
 
@@ -64,8 +67,11 @@ export class HomePage {
   }*/
 
   ionViewWillLeave() { //version websocket
-    this.socket.message.next(this.quitMessage);
-    this.subscribtion.unsubscribe();
+    let server = this.server.webSocketUrl();
+    if (server !== "ws://Not set:0000") {
+      this.socket.message.next(this.quitMessage);
+      this.subscribtion.unsubscribe();
+    }
     this.activePage = false;
   }
 
@@ -95,7 +101,10 @@ export class HomePage {
 
 
 
-  updateData() { //version websocket    
+  updateData() { //version websocket
+    let server = this.server.webSocketUrl();
+    console.log(server);
+    if (server !== "ws://Not set:0000") {    
     this.socket.connect();
     
     const interval = Rx.Observable.timer(200).flatMap(() => this.socket.message);
@@ -105,7 +114,8 @@ export class HomePage {
     });
     setTimeout(() => {
       this.socket.message.next(this.enterMessage);
-    },500);    
+    },500); 
+    }   
   }
 
   private enterMessage = { 
