@@ -12,6 +12,7 @@ import { HomeDataProvider } from '../../providers/home-provider/home';
 
 import { SocketProvider } from '../../providers/socket/socket';
 
+
 @IonicPage()
 @Component({
   selector: 'page-home',
@@ -101,21 +102,17 @@ export class HomePage {
 
 
 
-  updateData() { //version websocket
-    let server = this.server.webSocketUrl();
-    console.log(server);
-    if (server !== "ws://Not set:0000") {    
-    this.socket.connect();
-    
-    const interval = Rx.Observable.timer(200).flatMap(() => this.socket.message);
-    this.subscribtion = interval.subscribe(data => {
-      //console.log(data);
-      this.channels = data["channels"]; 
-    });
-    setTimeout(() => {
-      this.socket.message.next(this.enterMessage);
-    },500); 
-    }   
+  updateData() { //version websocket   
+      this.socket.connect();
+        const interval = Rx.Observable.timer(200).flatMap(() => this.socket.message);
+        this.subscribtion = interval.subscribe(data => {
+          //console.log(data);
+          this.channels = data["channels"]; 
+        });
+        this.socket.message.error
+        setTimeout(() => {
+          this.socket.message.next(this.enterMessage);
+        },500);   
   }
 
   private enterMessage = { 

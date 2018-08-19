@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { Platform } from 'ionic-angular';
 import { ServerURL } from '../../pages/configs/server';
+import { HttpClient } from '@angular/common/http';
 
 /*
   Generated class for the ServerUrlProvider provider.
@@ -22,7 +23,7 @@ export class ServerUrlProvider {
 
   winStorage = window.localStorage;
 
-  constructor(private nativeStorage: NativeStorage, private platform: Platform) {
+  constructor(private nativeStorage: NativeStorage, private platform: Platform,private http: HttpClient) {
     console.log('Hello ServerUrlProvider Provider');
   }
 
@@ -56,9 +57,15 @@ export class ServerUrlProvider {
     return new Promise((res, err) => {
       setTimeout(() => {
         if (this.platform.is('core')  || this.platform.is('mobileweb')){
-          //console.log("id windows platform");
-          let data = JSON.parse(this.winStorage.getItem('serverData'));
-            if (data) this.server = data;
+          //this.winStorage.removeItem('serverData'); //to test exception
+          let data = JSON.parse(this.winStorage.getItem('serverData'));          
+            if (data) {              
+              this.server = data;
+              res();
+            } else {
+              console.error("get server data from storage fail");
+              err();
+            }
         } else {
         this.nativeStorage.getItem('serverData')
           .then(
@@ -66,7 +73,7 @@ export class ServerUrlProvider {
             this.server = data;
             res();
           },
-          err => console.error('get server data from native storage fail'+ err))
+          err => console.error('get server data from storage fail'+ err))
         }
       }, 0);
     });
@@ -80,6 +87,20 @@ export class ServerUrlProvider {
     this.server.useRemote = false;
     this.server.websocketPort = "0000";
     this.putServer();
+  }
+
+  checkArduinoAddr(){
+    return new Promise((res, err)=>{
+      setTimeout(() => {
+        this.http.head(this.server.URL).subscribe((resolve) => {
+          res();
+          },
+          (error) => {
+            console.error(error);
+            err();
+          })
+      },0);
+    })
   }
 
 }

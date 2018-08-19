@@ -84,7 +84,7 @@ void setupTime() {
   
    do {
       setClock();  
-      WDT_Restart (WDT);
+      //WDT_Restart (WDT);
   }while (!timeStatus());
   
   //printTime();

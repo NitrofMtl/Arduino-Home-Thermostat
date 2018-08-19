@@ -37,20 +37,22 @@ export class ConfigsInputsPage {
   activePage: boolean = false;
 
   ionViewDidEnter() {
+    console.log("ionViewDidEnter inputs configs");
     this.updateData();
     this.activePage = true;
   }
 
   updateData(){
-    this.socket.connect();
-    this.subscribtion =  this.socket.message.subscribe(msg => {
-      let configs = <Configs>msg.data;
-      //console.log(configs); 
-      this.inputs = configs.inputs;
-    });
-    setTimeout(() => {
-      this.socket.message.next(this.enterMessage);
-  },500);
+      //console.log("connect to websocket");
+      this.socket.connect();
+      this.subscribtion =  this.socket.message.subscribe(msg => {
+        let configs = <Configs>msg.data;
+        //console.log(configs); 
+        this.inputs = configs.inputs;
+      });
+      setTimeout(() => {
+        this.socket.message.next(this.enterMessage);
+    },500);    
   }
  
   ionViewWillLeave() {

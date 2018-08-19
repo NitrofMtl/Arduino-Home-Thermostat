@@ -15,6 +15,7 @@ import { HomePage } from '../pages/home/home';
 import { SchedulePage } from '../pages/schedule/schedule';
 import { ConfigsPage } from '../pages/configs/configs';
 import { TabsPage } from '../pages/tabs/tabs';
+import { LoadPage } from '../pages/load/load';
 
 import { ConfigNamePage } from '../pages/config-name/config-name'
 import { ConfigsSystemPage } from '../pages/configs-system/configs-system';
@@ -38,6 +39,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 @NgModule({
   declarations: [
     MyApp,
+    LoadPage,
     HomePage,
     SchedulePage,
     ConfigsPage,
@@ -59,6 +61,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
+    LoadPage,
     HomePage,
     SchedulePage,
     ConfigsPage,

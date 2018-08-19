@@ -48,9 +48,9 @@
 #define SDC_PIN 4 // pin for sd card
 #define default_page "index.htm"  //set the default page to load on request
 
-void watchdogSetup (void) {
-  watchdogEnable(4095); //enable watchdog to maximum time 0xFFF
-}
+//void watchdogSetup (void) {
+  //watchdogEnable(4095); //enable watchdog to maximum time 0xFFF
+//}
 
 
 //currentSwitch workProof; not use in this controler
@@ -131,19 +131,19 @@ void setup() {
   setupEthernet();
   setupWebSocket();
   delay(1000);//for stability, make time to internet sheild to set up
-  WDT_Restart (WDT);
+  //WDT_Restart (WDT);
   setupTime();
-  WDT_Restart (WDT);
+  //WDT_Restart (WDT);
   timerMainRegulator.interval(sc(10), regulator_inputs); // read inputs every 10 sec
   timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //check weekly alarm each minute
   RTDSetup();
   setupOutput();
   setupWeeklyAlarm();
   restore(); //restoring user data from sd card
-  WDT_Restart (WDT); //reset the watchdog timer
+  //WDT_Restart (WDT); //reset the watchdog timer
   regulator_inputs(); //read inputs a first time before loop start
   delay(200);//for stability
-  WDT_Restart (WDT); //reset the watchdog timer
+  //WDT_Restart (WDT); //reset the watchdog timer
   //Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //---->>> moved to interval methode: outputs regulator controler at 10 Hz
   timerSSROutput.interval(100, (regulator_outputs));  //outputs regulator controler at 10 Hz
 
@@ -161,7 +161,7 @@ void loop() {
   webServ();
   webSocket.loop();
   Interval::handler();
-  WDT_Restart (WDT); //reset the watchdog timer
+  //WDT_Restart (WDT); //reset the watchdog timer
 }
 
 //-----------------------------------------------------------
