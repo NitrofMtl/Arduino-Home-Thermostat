@@ -3,10 +3,10 @@
 
 **NitrofMtl Library available on libreries manager:** 
 
--#include <weeklyAlarm.h>	[weeklyAlarm](https://github.com/NitrofMtl/weeklyAlarm) 
--#include <TimeOut.h>		[TimeOut](https://github.com/NitrofMtl/TimeOut) 
--#include <RTD10K.h>			[RTD10k-temp-sensor](https://github.com/NitrofMtl/RTD10k-temp-sensor) 
--#include <ADC_SEQR.h>		[ADC_SEQR](https://github.com/NitrofMtl/ADC_SEQR) 
+-[weeklyAlarm](https://github.com/NitrofMtl/weeklyAlarm) 
+-[TimeOut](https://github.com/NitrofMtl/TimeOut) 
+-[RTD10k-temp-sensor](https://github.com/NitrofMtl/RTD10k-temp-sensor) 
+-[ADC_SEQR](https://github.com/NitrofMtl/ADC_SEQR) 
 
 
 
