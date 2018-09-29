@@ -37,8 +37,8 @@ void setupEthernet() {
   server.begin();
   uHTTPserver->begin();
   uHTTPserver->uHTTPclient(&response);   //link uHTTP EthernetClient with sketch EthernetClient
-  uHTTPserver->addToContainer(GET, getContainer, SizeOfArray(getContainer)); //add get request to uhttp handeler
-  uHTTPserver->addToContainer(PUT, putContainer, SizeOfArray(putContainer)); //add put request to uhttp handeler
+  uHTTPserver->addToContainer(GET, getContainer, SizeOfArray(getContainer)); //add get request to uhttp handler
+  uHTTPserver->addToContainer(PUT, putContainer, SizeOfArray(putContainer)); //add put request to uhttp handler
   delay(1000);
 }
 
@@ -82,9 +82,9 @@ void setupTime() {
   if (Serial.available() > 0); 
   Serial.println("waiting for sync");
   
-   do {
-      setClock();  
-      //WDT_Restart (WDT);
+  do {
+    setClock();  
+    //WDT_Restart (WDT);
   }while (!timeStatus());
   
   //printTime();
@@ -150,10 +150,14 @@ void setupOutput() {
 
 void setupWeeklyAlarm() {
   init_alarmMemory();
-  //set alarm: (id, type, almSwitch, Hour, Min, callback)
-  //type:SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURSDAY, WEEK, WEEK_END, ALL_DAYS
+  //set alarm callback with int (callback, int)
+  //set alarm: (type, almSwitch, Hour, Min)
+  //AlarmType::SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURSDAY, WEEK, WEEK_END, ALL_DAYS
   for (int i = 0; i < numAlarm; i++) {
-    SPAlarm.set(i, ALL_DAYS, OFF, 0, 0, setSp);
+    //SPAlarm.set(i, ALL_DAYS, OFF, 0, 0, setSp);
+    SPAlarm[i].setCallback(setSp, i);
+    SPAlarm[i].set(AlarmType::ALL_DAYS, OFF, 0, 0);
+    weeklyAlarm.add(SPAlarm[i]);
   }
 }
 

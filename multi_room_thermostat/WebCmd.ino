@@ -75,7 +75,9 @@ void parseJSONswitchAlarms() {
     Serial.println("parseObject() failed");
     return;
   }
-  SPAlarm.toggle(root["switchAlarm"]["switchAlarm"]);    //toggle alarm switch
+  //SPAlarm.toggle(root["switchAlarm"]["switchAlarm"]);    //toggle alarm switch
+  int alm = root["switchAlarm"]["switchAlarm"];
+  SPAlarm[alm].toggle(); //toggle alarm switch
   backup();
 }
 
@@ -91,16 +93,7 @@ JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
 
 
   for (byte i = 0; i < numAlarm; i++) {
-    String OnOff = SPAlarm.isOnOff(i); //return String "ON" or "OFF"
-    String weekDay = SPAlarm.weekType(i); // return alarm type
-    byte hourAl = SPAlarm.almHour(i);
-    byte minAl = SPAlarm.almMin(i);
-    JsonObject& alarm_in = jsonBuffer.createObject();
-    alarm_in["switch"] = OnOff;
-    alarm_in["type"] = weekDay;
-    alarm_in["hour"] = hourAl;
-    alarm_in["minute"] = minAl;
-
+    JsonObject& alarm_in = SPAlarm[i].getJSON(jsonBuffer);
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
     for ( byte j = 0; j < numChannel; j++) {
       float setPointAl = alarmMem[i][j];
@@ -135,12 +128,8 @@ void parseJSONalarms() {
 
   //root.prettyPrintTo(Serial);
   int8_t alarmID = root["alarms"]["index"];
-  String weekType = root["alarms"]["data"]["type"];
-  String almrSwitch = root["alarms"]["data"]["switch"];
-  int8_t alrmHour = root["alarms"]["data"]["hour"];
-  int8_t alrmMin = root["alarms"]["data"]["minute"];
-  SPAlarm.set(alarmID, weekType, almrSwitch, alrmHour, alrmMin); //alarm tag, type alarm, alarm switch, hour, minute
-
+  JsonObject& alarm = root["alarms"]["data"];
+  SPAlarm[alarmID].parseJSON(alarm);
   JsonArray& setpoints = root["alarms"]["data"]["setpoints"];
   byte i = 0;
   for (JsonArray::iterator it = setpoints.begin(); it != setpoints.end(); ++it) {

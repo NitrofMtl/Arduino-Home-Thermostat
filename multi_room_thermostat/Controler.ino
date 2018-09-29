@@ -28,16 +28,17 @@ void inputRead() {
 
 void checkWeeklyAlarm() {
   //digitalClockDisplay();
-  SPAlarm.handler();
+  //SPAlarm.handler();
+  weeklyAlarm.handler();
 }
 
 void setSp(int numAlarm) { //set setpoint corresponding to the alarm trigged
-  for (byte i = 0; i < (numChannel); i++) {
-    if (outChannelID[i].channelSwitch) {
+  for (byte i = 0; i < numChannel; i++) {
+    //if (outChannelID[i].channelSwitch) {  //<== callball will not trig anyway withou switch...
       if ( 5 <= alarmMem[numAlarm][i]) { //add this condition to ignore 0 to keep setpoint to current setting
         outChannelID[i].sp = alarmMem[numAlarm][i];
       }
-    }
+    //}
   }
   backup(); //save data after change apply
 }

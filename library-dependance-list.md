@@ -30,7 +30,7 @@
 
 -#include <TimeLib.h>		[Time](https://github.com/PaulStoffregen/Time) 
 
--#include <DueTimer.h>		[DueTimer](https://github.com/ivanseidel/DueTimer) 
+-#include <DueTimer.h>	(not needed anymore)	[DueTimer](https://github.com/ivanseidel/DueTimer) 
 
 -#include <ArduinoJson.h>	[ArduinoJson](https://github.com/bblanchon/ArduinoJson) 
 

@@ -25,7 +25,8 @@ JsonObject& JSONbackup(JsonBuffer& jsonBuffer) {
 
   JsonArray& alarmID = backup.createNestedArray("alarms");
   for (byte i = 0; i < 10; i++) {
-    JsonObject& alarm_in = SPAlarm.backupAlarm(i, jsonBuffer);
+    //JsonObject& alarm_in = SPAlarm.backupAlarm(i, jsonBuffer);
+    JsonObject& alarm_in = SPAlarm[i].getJSON(jsonBuffer);
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
     for ( byte j = 0; j < numChannel; j++) {
       float setPointAl = alarmMem[i][j];
@@ -88,12 +89,13 @@ void restore() {
   for (JsonArray::iterator it = alarms.begin(); it != alarms.end(); ++it) {
     JsonObject& alarm = *it;
     //alarm.prettyPrintTo(Serial);
-    SPAlarm.restoreAlarm(alarmTag, alarm);
-    byte alarmType = alarm["type"];
+    SPAlarm[alarmTag].parseJSON(alarm);
+
+    /*byte alarmType = alarm["type"];  ////???
     bool alarmSwitch = alarm["switch"];
     byte wHour = alarm["hour"];
     byte wMin = alarm["minute"];
-    SPAlarm.set(alarmTag, alarmType, alarmSwitch, wHour, wMin);
+    SPAlarm.set(alarmTag, alarmType, alarmSwitch, wHour, wMin);*/
 
     JsonArray& setpoints = alarm["setpoints"];
     //setpoints.prettyPrintTo(Serial);

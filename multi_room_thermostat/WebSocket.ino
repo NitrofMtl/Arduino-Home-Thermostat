@@ -77,18 +77,18 @@ bool noSubscriber(bool subscribed[]) {
   }
 }
 
-enum wsRequestType { GETWS, PUTWS, SUBSCRIBE, UNSUBSCRIBE, CONSOLE_LOG };
+enum class wsRequestType { GET, PUT, SUBSCRIBE, UNSUBSCRIBE, CONSOLE_LOG };
 
 void wsRequestHandler(JsonObject& root, int num) {
   wsRequestType requestT;
-  if (strncmp(root["request"], "get", 3) == 0 ) requestT = GETWS;
-  else if (strncmp(root["request"], "put", 3) == 0 ) requestT = PUTWS;
-  else if (strncmp(root["request"], "sub", 3) == 0 ) requestT = SUBSCRIBE;
-  else if (strncmp(root["request"], "uns", 3) == 0 ) requestT = UNSUBSCRIBE;
-  else if (strncmp(root["request"], "con", 3) == 0 ) requestT = CONSOLE_LOG;
+  if (strncmp(root["request"], "get", 3) == 0 ) requestT = wsRequestType::GET;
+  else if (strncmp(root["request"], "put", 3) == 0 ) requestT = wsRequestType::PUT;
+  else if (strncmp(root["request"], "sub", 3) == 0 ) requestT = wsRequestType::SUBSCRIBE;
+  else if (strncmp(root["request"], "uns", 3) == 0 ) requestT = wsRequestType::UNSUBSCRIBE;
+  else if (strncmp(root["request"], "con", 3) == 0 ) requestT = wsRequestType::CONSOLE_LOG;
 
   switch (requestT) {
-    case GETWS:
+    case wsRequestType::GET:
       Serial.println("receive get request !!!");
       //root["data"] to do parse get data
       for (int i = 0; i < SWSGC; i++) { //i for request index
@@ -97,7 +97,7 @@ void wsRequestHandler(JsonObject& root, int num) {
         }
       }
       break;
-    case PUTWS:
+    case wsRequestType::PUT:
       Serial.println("receive put request !!!");
       for (int i = 0; i < SWSPC; i++) { //i for request index
         if ( strcmp(root["id"], wsPutContainer[i].id) == 0 ) {
@@ -107,7 +107,7 @@ void wsRequestHandler(JsonObject& root, int num) {
         }
       }
       break;
-    case SUBSCRIBE:
+    case wsRequestType::SUBSCRIBE:
       for (int i = 0; i < SWSGC; i++) { //i for request index
         if ( strcmp(root["id"], wsGetContainer[i].id) == 0 ) {
           //start sending data to client
@@ -118,14 +118,14 @@ void wsRequestHandler(JsonObject& root, int num) {
         }
       }
       break;
-    case UNSUBSCRIBE:
+    case wsRequestType::UNSUBSCRIBE:
       for (int i = 0; i < SWSGC; i++) { //i for request index
         if (subscribers[i][num]) Serial << ("unSubscribtion: Socket #") << num << endl;
         subscribers[i][num] = false;
         if (noSubscriber(subscribers[i])) timerWebSocket[i].cancel();
       }
       break;
-    case CONSOLE_LOG:
+    case wsRequestType::CONSOLE_LOG:
       char id[20]  { root["id"] };
       char log[200] { root["data"] };
       Serial << "WS console message From socket #" << num << "] id:[" << id << "][  " << log << " ]" << endl;

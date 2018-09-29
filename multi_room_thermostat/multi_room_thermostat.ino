@@ -28,7 +28,7 @@
 #include <EthernetUdp.h>
 #include "WebSocketsServer.h"
 #include <TimeLib.h>
-#include <weeklyAlarm.h>
+#include <WeeklyAlarm.h>
 //#include <DueTimer.h> //not used in this controler
 #include <TimeOut.h>
 //#include <currentSwitch.h>  //not used in this controler
@@ -44,7 +44,7 @@
 #define REQ_BUF_SZ   60   // size of buffer used to capture HTTP requests
 
 #define vRef 3.3   //set reference voltage to 3.3 or 5.0V
-#define RESO 12    //set resolution to 10 or 12 for arduino DUE
+#define RESO 12    //set resolution to 10 or 12 bit for arduino DUE
 #define SDC_PIN 4 // pin for sd card
 #define default_page "index.htm"  //set the default page to load on request
 
@@ -96,8 +96,9 @@ Interval timerWebSocket[WEBSOCKETS_SERVER_CLIENT_MAX];
 
 //programable alarm section
 const byte numAlarm = 10; // set the number of alarm
-WeeklyAlarm SPAlarm(numAlarm);//initiane 10 alarm
-float alarmMem[10][10];  // vector 1 = numAlarm, vector 2 = setpoint
+WeeklyAlarm weeklyAlarm;//main alarm instance
+AlarmInt SPAlarm[numAlarm];//initiate 10 alarm
+float alarmMem[numAlarm][10];  // vector 1 = numAlarm, vector 2 = setpoint
 
 
 
@@ -130,7 +131,7 @@ void setup() {
   setupSdCard();
   setupEthernet();
   setupWebSocket();
-  delay(1000);//for stability, make time to internet sheild to set up
+  delay(1000);//for stability,
   //WDT_Restart (WDT);
   setupTime();
   //WDT_Restart (WDT);
@@ -144,11 +145,10 @@ void setup() {
   regulator_inputs(); //read inputs a first time before loop start
   delay(200);//for stability
   //WDT_Restart (WDT); //reset the watchdog timer
-  //Timer4.attachInterrupt(regulator_outputs).setFrequency(10).start(); //---->>> moved to interval methode: outputs regulator controler at 10 Hz
-  timerSSROutput.interval(100, (regulator_outputs));  //outputs regulator controler at 10 Hz
+  timerSSROutput.interval(100, regulator_outputs);  //outputs regulator controler at 10 Hz
 
-  Serial.print ("Free memory is: ");
-  Serial.println (freeMemory ());
+  Serial.print("Free memory is: ");
+  Serial.println(freeMemory());
 
 }
 
@@ -157,7 +157,6 @@ void setup() {
 void webServ();
 
 void loop() {
-  //printTime();
   webServ();
   webSocket.loop();
   Interval::handler();

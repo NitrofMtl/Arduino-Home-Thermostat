@@ -29,6 +29,8 @@ Rap most of webpage file inside index.htm to have less request and faster load o
 Upgraded rest interface.
 General sketch structure upgrade, bugs fix...
 
+# When upgrading to weeklyAlarm librarie 4.0.2, you should delete backup file in your sd card to reset configuration.
+
 Check "Library-dependency-list.md" for all link of out side code.
 
   Copyright (c) 03/03/2017
