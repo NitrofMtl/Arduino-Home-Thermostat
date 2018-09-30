@@ -5,14 +5,15 @@ inline void microChrono(char* chronoId, void (*timedCallback)() ) {
   Serial << "Function " << chronoId << chrono << "uSec" << endl;
 }
 
-void regulator_inputs() {  //output regulation loop per channel
+void regulator() {  //output regulation loop per channel
   //microChrono("inputRead ", inputRead();
   inputRead();
+  regulator_outputs();
 }
 
 void regulator_outputs() { //outputs controler at 10Hz
   for (byte i = 0; i < 10; i++) {
-    outChannelID[i].ssrOut(&inChannelID[i]);//ssr controler
+    outChannelID[i].ssrOut(inChannelID[i]);//ssr controler
   }
 }
 
@@ -27,8 +28,7 @@ void inputRead() {
 //-----------------------------------------------------------
 
 void checkWeeklyAlarm() {
-  //digitalClockDisplay();
-  //SPAlarm.handler();
+  digitalClockDisplay(now(), Serial);
   weeklyAlarm.handler();
 }
 

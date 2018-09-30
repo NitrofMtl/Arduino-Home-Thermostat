@@ -108,8 +108,7 @@ void setupSdCard();
 void setupEthernet();
 void setupTime();
 void setupWebSocket();
-void regulator_inputs();
-void regulator_outputs();
+void regulator();
 void checkWeeklyAlarm();
 void RTDSetup();
 void setupOutput();
@@ -135,17 +134,17 @@ void setup() {
   //WDT_Restart (WDT);
   setupTime();
   //WDT_Restart (WDT);
-  timerMainRegulator.interval(sc(10), regulator_inputs); // read inputs every 10 sec
-  timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //check weekly alarm each minute
+  timerMainRegulator.interval(sc(10), regulator); // read inputs every 10 sec
+  //timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //move to syncClock
   RTDSetup();
   setupOutput();
   setupWeeklyAlarm();
   restore(); //restoring user data from sd card
   //WDT_Restart (WDT); //reset the watchdog timer
-  regulator_inputs(); //read inputs a first time before loop start
+  inputRead(); //read inputs a first time before loop start
   delay(200);//for stability
   //WDT_Restart (WDT); //reset the watchdog timer
-  timerSSROutput.interval(100, regulator_outputs);  //outputs regulator controler at 10 Hz
+  //timerSSROutput.interval(100, regulator_outputs); //now runnig into timeout method 
 
   Serial.print("Free memory is: ");
   Serial.println(freeMemory());
@@ -160,6 +159,7 @@ void loop() {
   webServ();
   webSocket.loop();
   Interval::handler();
+  TimeOut::handler();
   //WDT_Restart (WDT); //reset the watchdog timer
 }
 

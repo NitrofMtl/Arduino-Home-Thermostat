@@ -184,7 +184,7 @@ void wsParseHomePutSetpoint(JsonObject& data) {
 
 
 void wsSendDataConfigs() {
-  regulator_inputs();//refresh analog readings
+  inputRead();//refresh analog readings
   StaticJsonBuffer<1000> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
   json["id"] = "configs";

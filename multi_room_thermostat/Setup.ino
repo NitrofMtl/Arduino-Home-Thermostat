@@ -63,6 +63,7 @@ bool setClock() {
     time_t getTime = getNtpTime(ntpAddr);
     if (getTime) {
       setTime(getTime);
+      syncWithMinute();
       return true;
     }
   }
@@ -92,7 +93,25 @@ void setupTime() {
   lastNtpSync = now();
   digitalClockDisplay(now(), Serial);
   clkSync.interval(syncInterval, syncTime);
-  //setSyncInterval(86400000);//sync clock once a day
+  //setSyncInterval(86400000);//sync clock once a day  
+}
+
+void syncWithMinute() {
+  static int sec = -1;
+  if ( -1 == sec ) sec = second(); //set sec in the first pass
+  if ( second() == sec ) { //loop back function if second did not change
+    TimeOut(1, syncWithMinute);
+    return;
+  } 
+  int timeBeforeNewMinute = (60 - second()) * 1000; //millisecond before new minute
+  TimeOut(timeBeforeNewMinute, starWeeklyAlarmHandler);
+  sec = -1; //reset checker for the next sync
+}
+
+void starWeeklyAlarmHandler() {
+  timerWeeklyAlarm.cancel();
+  checkWeeklyAlarm();
+  timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //check weekly alarm each minute
 }
 
 
@@ -150,11 +169,10 @@ void setupOutput() {
 
 void setupWeeklyAlarm() {
   init_alarmMemory();
-  //set alarm callback with int (callback, int)
-  //set alarm: (type, almSwitch, Hour, Min)
-  //AlarmType::SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURSDAY, WEEK, WEEK_END, ALL_DAYS
+    //set alarm callback with int (callback, int)
+    //set alarm: (type, almSwitch, Hour, Min)
+    //AlarmType::SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURSDAY, WEEK, WEEK_END, ALL_DAYS
   for (int i = 0; i < numAlarm; i++) {
-    //SPAlarm.set(i, ALL_DAYS, OFF, 0, 0, setSp);
     SPAlarm[i].setCallback(setSp, i);
     SPAlarm[i].set(AlarmType::ALL_DAYS, OFF, 0, 0);
     weeklyAlarm.add(SPAlarm[i]);
