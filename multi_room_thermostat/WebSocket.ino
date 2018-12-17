@@ -102,6 +102,7 @@ void wsRequestHandler(JsonObject& root, int num) {
       for (int i = 0; i < SWSPC; i++) { //i for request index
         if ( strcmp(root["id"], wsPutContainer[i].id) == 0 ) {
           Serial << "found put request: " << wsPutContainer[i].id << endl;
+          root["data"].printTo(Serial); Serial << endl;
           wsPutContainer[i].parse(root["data"]);
           backup(); //store any change data
         }
@@ -166,11 +167,10 @@ void wsSubscribeDataHome() {
 }
 
 void wsParseHomeSwitch(JsonObject& data) {
-
-  //root.prettyPrintTo(Serial);
-  uint8_t  chanId = data["switchCh"]["canal"];
+  uint8_t  chanId = data["canal"];
   outChannelID[chanId].channelSwitch = !outChannelID[chanId].channelSwitch;
   //if (outChannelID[chanId].channelSwitch) Serial.println("true"); else  Serial.println("false");
+  wsSubscribeDataHome();//update live data to devices
 }
 
 void wsParseHomePutSetpoint(JsonObject& data) {
@@ -178,6 +178,7 @@ void wsParseHomePutSetpoint(JsonObject& data) {
   byte  chanId = data["canal"];
   strcpy(inChannelID[chanId].channelName, data["name"]);
   outChannelID[chanId].sp = data["setpoint"];
+  wsSubscribeDataHome();//update live data to devices
 }
 
 //-----------------------------------------------------------

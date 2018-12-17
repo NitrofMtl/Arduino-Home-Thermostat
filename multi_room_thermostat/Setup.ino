@@ -186,3 +186,9 @@ void init_alarmMemory() {   //initiane alarm memory matrix to 21C by default
     }
   }
 }
+
+void blink13() {
+  static bool state = false;
+  digitalWrite(13, state);
+  state = !state;
+}

@@ -176,7 +176,7 @@ JsonObject& JSONconfigs__Corrected(JsonBuffer& jsonBuffer) {
     JsonObject& chan_in = jsonBuffer.createObject();
     chan_in["offset"] = inChannelID[i].offset;
     chan_in["canal"] = String(i);
-    chan_in["temperature"] = inChannelID[i].Ainput;
+    chan_in["temperature"] = roundToDigit(inChannelID[i].Ainput, 2);//inChannelID[i].Ainput;
     chan.add(chan_in);
   }
   configs["systemTime"] = systemTime(jsonBuffer);

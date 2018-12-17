@@ -130,7 +130,9 @@ export class HomePage {
   }*/
 
   switchChannel(cb: Channel) { //version websocket
-    let switchCh = cb.canal; 
+    let switchCh = {
+      canal: cb.canal
+    } 
   
     let postMessage = {
       id: "homeSwitch",

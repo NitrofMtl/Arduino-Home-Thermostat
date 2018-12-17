@@ -14,14 +14,14 @@
 
 
 <ion-content padding>
-    <ion-list *ngFor = "let input of inputs">
+    <ion-list *ngFor = "let input of inputs; let i = index">
       <div>
-        <h5>{{input.canal}} : </h5>
-        <h3 class="h3temp">{{input.temperature}} \xB0C</h3>
-        <h3 class="h3offset"> Offset {{input.offset}}</h3>
+        <button ion-button round (tap)="minus(i)">-</button>
+        <h3>{{input.canal}} : </h3>
+        <h3> Offset {{input.offset}}</h3>
+        <button ion-button round (tap)="plus(i)">+</button>
       </div>
-      <ion-item>
-        <ion-range [(ngModel)]="input.offset" color="darkblue" pin="true"min="-25" max="25" step="1" list="tickmarks" (ionChange)="changeOffset(input.canal, input.offset)"></ion-range>
-      </ion-item>
+      <!--<h3 class="tcenter">{{input.temperature}} \xB0C</h3>-->
+      <h3 class="tcenter">{{input.temperature.toFixed(2)}} \xB0C</h3>
     </ion-list> 
 </ion-content>

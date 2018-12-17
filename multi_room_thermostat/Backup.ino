@@ -91,12 +91,6 @@ void restore() {
     //alarm.prettyPrintTo(Serial);
     SPAlarm[alarmTag].parseJSON(alarm);
 
-    /*byte alarmType = alarm["type"];  ////???
-    bool alarmSwitch = alarm["switch"];
-    byte wHour = alarm["hour"];
-    byte wMin = alarm["minute"];
-    SPAlarm.set(alarmTag, alarmType, alarmSwitch, wHour, wMin);*/
-
     JsonArray& setpoints = alarm["setpoints"];
     //setpoints.prettyPrintTo(Serial);
 

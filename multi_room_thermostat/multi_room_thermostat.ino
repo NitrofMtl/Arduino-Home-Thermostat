@@ -93,6 +93,8 @@ Interval timerMainRegulator;
 Interval timerWeeklyAlarm;
 Interval timerSSROutput;
 Interval timerWebSocket[WEBSOCKETS_SERVER_CLIENT_MAX];
+Interval led13;
+void blink13();
 
 //programable alarm section
 const byte numAlarm = 10; // set the number of alarm
@@ -148,7 +150,8 @@ void setup() {
 
   Serial.print("Free memory is: ");
   Serial.println(freeMemory());
-
+  pinMode(13, OUTPUT);
+  led13.interval(2000, blink13);
 }
 
 //-----------------------------------------------------------

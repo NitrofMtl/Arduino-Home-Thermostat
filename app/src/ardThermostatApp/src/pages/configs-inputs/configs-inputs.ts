@@ -71,6 +71,20 @@ export class ConfigsInputsPage {
     request: 'unsubscribe'
   }
 
+  plus(chan: number) {
+    if (this.inputs[chan].offset < 25) {
+      this.inputs[chan].offset++;
+      this.changeOffset(chan, this.inputs[chan].offset);
+    }
+  }
+
+  minus(chan: number) {
+    if (this.inputs[chan].offset > -25) {
+      this.inputs[chan].offset--;
+      this.changeOffset(chan, this.inputs[chan].offset);
+    }
+  }
+
   changeOffset(chan: number, input: number): void {
     
     let configChannel = {

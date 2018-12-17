@@ -23,7 +23,7 @@ export class LoadPage {
 
   ionViewDidEnter() {
     console.log('ionViewDidLoad LoadPage');
-    this.statusMessage = "Getting adrresse from storage";
+    this.statusMessage = "Getting addresse from storage";
     //console.log(this.statusMessage);
     this.server.getServer().then(()=>{
       this.statusMessage = "Got data. Check for server response";
