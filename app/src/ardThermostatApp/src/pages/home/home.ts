@@ -63,10 +63,6 @@ export class HomePage {
     });      
   }
 
-  /*ionViewWillLeave() { ////version http
-    this.subscription.unsubscribe();
-  }*/
-
   ionViewWillLeave() { //version websocket
     let server = this.server.webSocketUrl();
     if (server !== "ws://Not set:0000") {
@@ -86,21 +82,6 @@ export class HomePage {
       this.screenVertical = false;
     }
   }
-
-/*
-  updateData() { //version http
-    this.homedata.getData().subscribe(data => {
-      this.channels = data["channels"];
-    },
-  (error:any) => {
-    console.error("Server connection error, go to server configs page");
-    this.nav.push(ConfigsServerPage);
-  })
-    const interval = Rx.Observable.interval(0).flatMap(() => this.homedata.getData());
-    this.subscription = interval.subscribe(data => { this.channels = data["channels"]; });
-  }*/
-
-
 
   updateData() { //version websocket   
       this.socket.connect();
@@ -125,9 +106,6 @@ export class HomePage {
     request: 'unsubscribe'
   }
 
-  /*switchChannel(cb: Channel) { //version http
-    this.homedata.switchChannel(cb);
-  }*/
 
   switchChannel(cb: Channel) { //version websocket
     let switchCh = {

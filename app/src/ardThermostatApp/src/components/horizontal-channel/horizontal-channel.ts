@@ -21,7 +21,7 @@ export class HorizontalChannelComponent {
 
   constructor() {
   }
-
+  
   parentSwitchChannel(event, cb: Channel) {
     this.switchClick.emit(cb);
   }
