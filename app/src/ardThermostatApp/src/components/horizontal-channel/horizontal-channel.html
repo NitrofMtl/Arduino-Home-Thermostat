@@ -6,8 +6,9 @@
     <div class="top75">
       <button class="button-onoff" (click)='parentSwitchChannel($event, channel);'>
         {{channel.status}}
-      </button>
+      </button>      
     </div>
+    <heater-svg [stage]="channel.percentOut" [id]="channel.canal"></heater-svg>
   </div>   
     <ion-item>
       <div class="slidecontainer">

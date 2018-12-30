@@ -29,6 +29,7 @@ import { ScreenOrientation } from "@ionic-native/screen-orientation";
 
 import { VerticalChannelComponent } from '../components/vertical-channel/vertical-channel';
 import { HorizontalChannelComponent } from '../components/horizontal-channel/horizontal-channel';
+import { HeaterSvgComponent } from '../components/heater-svg/heater-svg';
 import { ScheduleProvider } from '../providers/schedule/schedule';
 import { WebsocketProvider } from '../providers/websocket/websocket';
 import { SocketProvider } from '../providers/socket/socket';
@@ -50,6 +51,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     ConfigsServerPage,
     VerticalChannelComponent,
     HorizontalChannelComponent,
+    HeaterSvgComponent,
   ],
   imports: [
     BrowserModule,

@@ -11,6 +11,7 @@
         </div>
         <h1 class="temp">{{channel.temperature.toFixed(1)}} \xB0C</h1>
         <br>
+          <heater-svg [stage]="channel.percentOut" [id]="channel.canal"></heater-svg>
         <h3 >
           <div>Setpoint:</div>
           <div>{{channel.setpoint}} \xB0C</div>
@@ -34,7 +35,6 @@
           </div>
         </div>
       </ion-item>
-
     </div>
   </div>
 </div>
