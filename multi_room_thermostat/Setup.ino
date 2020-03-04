@@ -131,7 +131,7 @@ void setupWebSocket() {
 
 //-----------------------------------------------------------
 void RTDSetup() {
-  adc.begin(); //initiate sequencer, have to be before 'analogReadResolution' call to not reset it to 10
+  //adc.begin(); //initiate sequencer, have to be before 'analogReadResolution' call to not reset it to 10
   analogReadResolution(RESO); //set arduino analog input to 12 bit reading
   /////         RTD inputs struct initializing
   //InChannels[id](name, pin, offset(optionnal))
@@ -145,6 +145,20 @@ void RTDSetup() {
   inChannelID[7].channelSet( "name7", A7 );
   inChannelID[8].channelSet( "name8", A8 );
   inChannelID[9].channelSet( "name9", A9 );
+  //start sampelr at 1Hz
+  adc.begin(1,
+    inChannelID[0].AinputPin,
+    inChannelID[1].AinputPin,
+    inChannelID[2].AinputPin,
+    inChannelID[3].AinputPin,
+    inChannelID[4].AinputPin,
+    inChannelID[5].AinputPin,
+    inChannelID[6].AinputPin,
+    inChannelID[7].AinputPin,
+    inChannelID[8].AinputPin,
+    inChannelID[9].AinputPin
+    );
+  //adc.begin(1,0,1,2,3,4,5,6,7,8,9);
 }
 
 //-----------------------------------------------------------
@@ -172,7 +186,7 @@ void setupWeeklyAlarm() {
     //set alarm callback with int (callback, int)
     //set alarm: (type, almSwitch, Hour, Min)
     //AlarmType::SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURSDAY, WEEK, WEEK_END, ALL_DAYS
-  for (int i = 0; i < numAlarm; i++) {
+  for (int i = 0; i < NUM_ALARM; i++) {
     SPAlarm[i].setCallback(setSp, i);
     SPAlarm[i].set(AlarmType::ALL_DAYS, OFF, 0, 0);
     weeklyAlarm.add(SPAlarm[i]);
@@ -180,7 +194,7 @@ void setupWeeklyAlarm() {
 }
 
 void init_alarmMemory() {   //initiane alarm memory matrix to 21C by default
-  for (byte i = 0; i < numAlarm; i++) {
+  for (byte i = 0; i < NUM_ALARM; i++) {
     for (byte j = 0; j < numChannel; j++) {
       alarmMem[i][j] = 0;
     }

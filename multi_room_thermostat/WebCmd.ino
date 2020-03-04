@@ -92,7 +92,7 @@ JsonObject& JSONalarm(JsonBuffer& jsonBuffer) {
   JsonArray& alarmID = alarm.createNestedArray("alarms");
 
 
-  for (byte i = 0; i < numAlarm; i++) {
+  for (byte i = 0; i < NUM_ALARM; i++) {
     JsonObject& alarm_in = SPAlarm[i].getJSON(jsonBuffer);
     JsonArray& setpoint = alarm_in.createNestedArray("setpoints");
     for ( byte j = 0; j < numChannel; j++) {

@@ -18,10 +18,13 @@ void regulator_outputs() { //outputs controler at 10Hz
 }
 
 void inputRead() {
-  for ( byte ch = 0; ch < numChannel; ch++) {
-    //read analog input and convert to temp
-    inChannelID[ch].Ainput = RTDRead.readBit(adc.read(inChannelID[ch].AinputPin) - inChannelID[ch].offset) ;   // buffer input variable and add offset adjustement
-    //Serial << "input: " << inChannelID[ch].Ainput << char(186) << "C" << endl;
+  while (adc.available()) {
+    uint16_t* data = ADC_Sampler::data();  //get data from buffer
+    for ( byte ch = 0; ch < numChannel; ch++) {
+    //read analog input and convert to temp  
+      inChannelID[ch].Ainput = RTDRead.readBit(data[ch] - inChannelID[ch].offset) ;   // buffer input variable and add offset adjustement
+      //Serial << "input: " << inChannelID[ch].Ainput << char(186) << "C" << endl;
+    }
   }
 }
 

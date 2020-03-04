@@ -9,3 +9,6 @@ version history:
 Knowed bugs:
 -Windows platform seem to not connect with local connection.
 -Silder temp adjust setpoint do not display properly on windows
+
+2.2
+-change alalog sequencer for adc sampler

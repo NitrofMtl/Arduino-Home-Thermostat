@@ -1,4 +1,4 @@
-# Arduino-Home-Thermostat Version 2.1
+# Arduino-Home-Thermostat Version 2.2
 10 rooms thermostat
 
 

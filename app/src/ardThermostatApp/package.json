@@ -29,8 +29,9 @@
     "@ionic/storage": "2.1.3",
     "cordova-android": "7.1.4",
     "cordova-plugin-device": "^2.0.2",
+    "cordova-plugin-ionic": "5.2.9",
     "cordova-plugin-ionic-keyboard": "^2.1.2",
-    "cordova-plugin-ionic-webview": "^2.0.3",
+    "cordova-plugin-ionic-webview": "^3.0.0",
     "cordova-plugin-nativestorage": "^2.3.2",
     "cordova-plugin-screen-orientation": "^3.0.1",
     "cordova-plugin-splashscreen": "^5.0.2",
@@ -56,12 +57,14 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-device": {},
       "cordova-plugin-splashscreen": {},
-      "cordova-plugin-ionic-webview": {},
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-screen-orientation": {},
       "cordova-plugin-nativestorage": {},
       "ionic-plugin-keyboard": {},
-      "cordova-plugin-statusbar": {}
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-ionic-webview": {
+        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
+      }
     },
     "platforms": [
       "windows"

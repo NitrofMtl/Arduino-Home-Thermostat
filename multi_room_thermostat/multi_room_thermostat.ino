@@ -22,24 +22,26 @@
 */
 
 #include <SD.h>
-#include <SPI.h>
+//#include <SPI.h>
 #include <Dns.h>
-#include <Ethernet.h>
-#include <EthernetUdp.h>
+#include "Ethernet.h"
+#include "EthernetUdp.h"
 #include "WebSocketsServer.h"
-#include <TimeLib.h>
-#include <WeeklyAlarm.h>
+#include "TimeLib.h"
+#include "WeeklyAlarm.h"
 //#include <DueTimer.h> //not used in this controler
-#include <TimeOut.h>
+#include "TimeOut.h"
 //#include <currentSwitch.h>  //not used in this controler
 //#include <Bounce2.h> //not used in this controler
-#include <uHTTP.h>
+#include "uHTTP.h"
 #include <ArduinoJson.h>
-#include <snippets.h>
-#include <RTD10K.h>
-#include <IOctrl.h>
-#include <ADC_SEQR.h>
-#include <Streaming.h>
+#include "snippets.h"
+#include "RTD10K.h"
+#include "IOctrl.h"
+//#include "ADC_SEQR.h"
+#include "ADC_Sampler.h"
+#include "Streaming.h"
+#include <SPI.h>
 
 #define REQ_BUF_SZ   60   // size of buffer used to capture HTTP requests
 
@@ -74,12 +76,14 @@ WebSocketsServer webSocket = WebSocketsServer(8181);
 enum SubscriberPages { HOME, ALARMS, CONFIGS, SIZE_OF_ENUM };
 bool subscribers   [WEBSOCKETS_SERVER_CLIENT_MAX][SIZE_OF_ENUM]  ;
 
-Adc_Seqr adc;
-
+//Adc_Seqr adc;
+ADC_Sampler adc;
+#define numChannel 10
+const uint8_t ADC_sequencer_size = numChannel; // MUST match the numer of input in ADC_Sample->begin()
 
 RTD10k RTDRead(RESO); //library to read 10k RTD input
 //    Per channel declare section
-const byte numChannel = 10;
+
 RTDinChannels inChannelID[numChannel]; //input channel obj
 SSRoutput outChannelID[numChannel]; //ouput channel obj
 
@@ -97,10 +101,10 @@ Interval led13;
 void blink13();
 
 //programable alarm section
-const byte numAlarm = 10; // set the number of alarm
+#define NUM_ALARM 10 // set the number of alarm
 WeeklyAlarm weeklyAlarm;//main alarm instance
-AlarmInt SPAlarm[numAlarm];//initiate 10 alarm
-float alarmMem[numAlarm][10];  // vector 1 = numAlarm, vector 2 = setpoint
+AlarmInt SPAlarm[NUM_ALARM];//initiate 10 alarm
+float alarmMem[NUM_ALARM][10];  // vector 1 = numAlarm, vector 2 = setpoint
 
 
 
@@ -136,7 +140,7 @@ void setup() {
   //WDT_Restart (WDT);
   setupTime();
   //WDT_Restart (WDT);
-  timerMainRegulator.interval(sc(10), regulator); // read inputs every 10 sec
+  timerMainRegulator.interval(sc(1), regulator); // read inputs every 10 sec
   //timerWeeklyAlarm.interval(mn(1), checkWeeklyAlarm); //move to syncClock
   RTDSetup();
   setupOutput();
@@ -144,6 +148,7 @@ void setup() {
   restore(); //restoring user data from sd card
   //WDT_Restart (WDT); //reset the watchdog timer
   inputRead(); //read inputs a first time before loop start
+  SPI.setClockDivider(1);
   delay(200);//for stability
   //WDT_Restart (WDT); //reset the watchdog timer
   //timerSSROutput.interval(100, regulator_outputs); //now runnig into timeout method 
@@ -161,9 +166,11 @@ void webServ();
 void loop() {
   webServ();
   webSocket.loop();
-  Interval::handler();
+  //Interval::handler();
   TimeOut::handler();
   //WDT_Restart (WDT); //reset the watchdog timer
 }
 
 //-----------------------------------------------------------
+
+
