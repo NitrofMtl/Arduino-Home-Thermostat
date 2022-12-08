@@ -1,4 +1,4 @@
-# DEPRECATED
+# OBSELETE
 
 # Arduino-Home-Thermostat Version 2.2
 10 rooms thermostat
